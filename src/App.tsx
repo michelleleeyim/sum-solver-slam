@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import DrillRunner from "./pages/DrillRunner";
 import Summary from "./pages/Summary";
+import ThreeSumRunner from "./pages/ThreeSumRunner";
+import ThreeSumSummary from "./pages/ThreeSumSummary";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,6 +22,8 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/drill/two-pointers" element={<DrillRunner />} />
           <Route path="/summary" element={<Summary />} />
+          <Route path="/drill/three-sum" element={<ThreeSumRunner />} />
+          <Route path="/summary/three-sum" element={<ThreeSumSummary />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

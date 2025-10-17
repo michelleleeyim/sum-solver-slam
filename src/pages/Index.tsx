@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowRight, Target, Zap, Trophy } from "lucide-react";
+import { ArrowRight, Target, Zap, Trophy, Layers } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
@@ -23,70 +23,128 @@ const Index = () => {
           </p>
         </motion.div>
 
-        {/* Category Card */}
-        <motion.div
-          initial={{ y: 40, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-        >
-          <Card className="p-8 shadow-xl bg-gradient-to-br from-card to-card/80 border-2 border-primary/20">
-            <div className="flex items-start gap-4 mb-6">
-              <div className="p-3 rounded-2xl bg-primary/10">
-                <Target className="h-8 w-8 text-primary" />
+        {/* Category Cards */}
+        <div className="grid md:grid-cols-2 gap-6 mb-12">
+          {/* Two Pointers Card */}
+          <motion.div
+            initial={{ y: 40, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+          >
+            <Card className="p-8 shadow-xl bg-gradient-to-br from-card to-card/80 border-2 border-primary/20 h-full">
+              <div className="flex items-start gap-4 mb-6">
+                <div className="p-3 rounded-2xl bg-primary/10">
+                  <Target className="h-8 w-8 text-primary" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold mb-2 text-card-foreground">
+                    Two Pointers – Pair Sum
+                  </h2>
+                  <p className="text-muted-foreground">
+                    Learn the classic two-pointer technique for finding pairs in sorted arrays. Make
+                    split-second decisions: move left, move right, or claim victory.
+                  </p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-2xl font-bold mb-2 text-card-foreground">
-                  Two Pointers – Pair Sum
-                </h2>
-                <p className="text-muted-foreground">
-                  Learn the classic two-pointer technique for finding pairs in sorted arrays. Make
-                  split-second decisions: move left, move right, or claim victory.
-                </p>
-              </div>
-            </div>
 
-            {/* Stats Preview */}
-            <div className="grid grid-cols-3 gap-4 mb-6 p-4 bg-secondary/50 rounded-xl">
-              <div className="text-center">
-                <Zap className="h-5 w-5 text-primary mx-auto mb-1" />
-                <p className="text-sm text-muted-foreground">Quick Drills</p>
-                <p className="text-lg font-bold text-card-foreground">10 min</p>
+              {/* Stats Preview */}
+              <div className="grid grid-cols-3 gap-4 mb-6 p-4 bg-secondary/50 rounded-xl">
+                <div className="text-center">
+                  <Zap className="h-5 w-5 text-primary mx-auto mb-1" />
+                  <p className="text-sm text-muted-foreground">Quick Drills</p>
+                  <p className="text-lg font-bold text-card-foreground">10 min</p>
+                </div>
+                <div className="text-center">
+                  <Trophy className="h-5 w-5 text-accent mx-auto mb-1" />
+                  <p className="text-sm text-muted-foreground">Skill Level</p>
+                  <p className="text-lg font-bold text-card-foreground">Beginner</p>
+                </div>
+                <div className="text-center">
+                  <Target className="h-5 w-5 text-primary mx-auto mb-1" />
+                  <p className="text-sm text-muted-foreground">Drills</p>
+                  <p className="text-lg font-bold text-card-foreground">20+</p>
+                </div>
               </div>
-              <div className="text-center">
-                <Trophy className="h-5 w-5 text-accent mx-auto mb-1" />
-                <p className="text-sm text-muted-foreground">Skill Level</p>
-                <p className="text-lg font-bold text-card-foreground">Beginner</p>
-              </div>
-              <div className="text-center">
-                <Target className="h-5 w-5 text-primary mx-auto mb-1" />
-                <p className="text-sm text-muted-foreground">Drills</p>
-                <p className="text-lg font-bold text-card-foreground">20+</p>
-              </div>
-            </div>
 
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3">
+              {/* Action Buttons */}
+              <div className="flex flex-col gap-3">
+                <Button
+                  asChild
+                  size="lg"
+                  className="h-14 text-lg font-bold bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 text-primary-foreground shadow-lg"
+                >
+                  <Link to="/drill/two-pointers?mode=micro">
+                    Quick Drill (Micro)
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+                <Button
+                  asChild
+                  size="lg"
+                  variant="outline"
+                  className="h-14 text-lg font-bold border-2 border-primary text-primary hover:bg-primary/10"
+                >
+                  <Link to="/drill/two-pointers?mode=mini">Multi-Step (Mini)</Link>
+                </Button>
+              </div>
+            </Card>
+          </motion.div>
+
+          {/* 3Sum Card */}
+          <motion.div
+            initial={{ y: 40, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+          >
+            <Card className="p-8 shadow-xl bg-gradient-to-br from-card to-card/80 border-2 border-purple-500/20 h-full">
+              <div className="flex items-start gap-4 mb-6">
+                <div className="p-3 rounded-2xl bg-purple-500/10">
+                  <Layers className="h-8 w-8 text-purple-500" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold mb-2 text-card-foreground">
+                    3Sum Pattern – Nested Two Pointers
+                  </h2>
+                  <p className="text-muted-foreground">
+                    Master the nested pointer technique by fixing one element and applying two-pointer
+                    logic to find triplets. Level up your algorithm skills!
+                  </p>
+                </div>
+              </div>
+
+              {/* Stats Preview */}
+              <div className="grid grid-cols-3 gap-4 mb-6 p-4 bg-secondary/50 rounded-xl">
+                <div className="text-center">
+                  <Zap className="h-5 w-5 text-purple-500 mx-auto mb-1" />
+                  <p className="text-sm text-muted-foreground">Duration</p>
+                  <p className="text-lg font-bold text-card-foreground">15 min</p>
+                </div>
+                <div className="text-center">
+                  <Trophy className="h-5 w-5 text-accent mx-auto mb-1" />
+                  <p className="text-sm text-muted-foreground">Skill Level</p>
+                  <p className="text-lg font-bold text-card-foreground">Intermediate</p>
+                </div>
+                <div className="text-center">
+                  <Layers className="h-5 w-5 text-purple-500 mx-auto mb-1" />
+                  <p className="text-sm text-muted-foreground">Drills</p>
+                  <p className="text-lg font-bold text-card-foreground">5+</p>
+                </div>
+              </div>
+
+              {/* Action Button */}
               <Button
                 asChild
                 size="lg"
-                className="flex-1 h-14 text-lg font-bold bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 text-primary-foreground shadow-lg"
+                className="w-full h-14 text-lg font-bold bg-gradient-to-r from-purple-500 to-purple-600 hover:opacity-90 text-white shadow-lg"
               >
-                <Link to="/drill/two-pointers?mode=micro">
-                  Quick Drill (Micro)
+                <Link to="/drill/three-sum">
+                  Start 3Sum Drill
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="outline"
-                className="flex-1 h-14 text-lg font-bold border-2 border-primary text-primary hover:bg-primary/10"
-              >
-                <Link to="/drill/two-pointers?mode=mini">Multi-Step (Mini)</Link>
-              </Button>
-            </div>
-          </Card>
-        </motion.div>
+            </Card>
+          </motion.div>
+        </div>
 
         {/* How It Works */}
         <motion.div
