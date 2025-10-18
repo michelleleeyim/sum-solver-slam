@@ -9,6 +9,7 @@ import { ThreeSumChoiceBar } from "@/components/drill/ThreeSumChoiceBar";
 import { FeedbackTray } from "@/components/drill/FeedbackTray";
 import { FoundTripletsPanel } from "@/components/drill/FoundTripletsPanel";
 import { LoopProgressIndicator } from "@/components/drill/LoopProgressIndicator";
+import { ProblemDescription } from "@/components/drill/ProblemDescription";
 import {
   ThreeSumState,
   ThreeSumAction,
@@ -174,6 +175,14 @@ const ThreeSumRunner = () => {
             <span className="text-accent font-bold">R</span> to find triplets
           </p>
         </motion.div>
+
+        {/* Problem Description */}
+        {drillsData.problemDescription && (
+          <ProblemDescription
+            description={drillsData.problemDescription}
+            storageKey="hideDesc:/drill/three-sum"
+          />
+        )}
 
         {/* Main Content */}
         <div className="grid lg:grid-cols-3 gap-6">

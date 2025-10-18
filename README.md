@@ -1,4 +1,29 @@
-# Welcome to your Lovable project
+# Algorithm Drills – Visual Two Pointers Trainer
+
+Train algorithm instincts visually through interactive micro-puzzles. Master pointer patterns without writing code.
+
+## Features
+
+### Available Drills
+
+1. **Two Pointers – Pair Sum** (Beginner)
+   - Learn the classic two-pointer technique for finding pairs in sorted arrays
+   - Micro mode: Single-step decision making
+   - Mini mode: Multi-step sequences
+
+2. **3Sum Pattern** (Intermediate)
+   - Master nested pointer logic by fixing one element and applying two-pointer technique
+   - Visualize outer loop progression with inner two-pointer search
+   - Track all found triplets in real-time
+
+3. **Container With Most Water** (Intermediate)
+   - Practice the greedy two-pointer approach
+   - Always move the shorter line to maximize area
+   - Visualize water containers between vertical bars
+
+### Problem Descriptions
+
+Each drill optionally displays a short problem statement (no hints) above the interactive board. The description is loaded from the drill's data JSON via `problemDescription` field. Users can toggle visibility with the "?" button, and the preference is saved in localStorage.
 
 ## Project info
 
