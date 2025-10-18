@@ -18,7 +18,10 @@ import {
   initializeState,
 } from "@/core/engine/container";
 import { saveSessionSummary } from "@/lib/storage";
-import drillsData from "@/data/container.drills.json";
+import { generateContainerDrill } from "@/lib/drillGenerator";
+
+const PROBLEM_DESCRIPTION = "Given n non-negative integers representing vertical line heights, find two lines that together with the x-axis form a container that holds the most water.";
+const TOTAL_DRILLS = 10;
 
 export default function ContainerRunner() {
   const navigate = useNavigate();
@@ -36,21 +39,17 @@ export default function ContainerRunner() {
   const [startTime] = useState(Date.now());
   const [drillStats, setDrillStats] = useState<{ correct: boolean; attempts: number }[]>([]);
 
-  const currentSet = drillsData.sets[0];
-  const totalDrills = currentSet.drills.length;
-  const problemDescription = drillsData.problemDescription;
-
   useEffect(() => {
     loadDrill(0);
   }, []);
 
   const loadDrill = (index: number) => {
-    if (index >= totalDrills) {
+    if (index >= TOTAL_DRILLS) {
       finishSession();
       return;
     }
 
-    const drill = currentSet.drills[index];
+    const drill = generateContainerDrill("easy");
     setState(initializeState(drill.H));
     setAttempts(0);
     setFeedback({ type: null, message: "" });
@@ -175,7 +174,7 @@ export default function ContainerRunner() {
           </div>
           <SessionHUD
             progress={currentDrillIndex}
-            total={totalDrills}
+            total={TOTAL_DRILLS}
             score={score}
             combo={combo}
             target={state.bestArea}
@@ -184,12 +183,10 @@ export default function ContainerRunner() {
       </header>
 
       {/* Problem Description */}
-      {problemDescription && (
-        <ProblemDescription
-          description={problemDescription}
-          storageKey="hideDesc:/drill/container"
-        />
-      )}
+      <ProblemDescription
+        description={PROBLEM_DESCRIPTION}
+        storageKey="hideDesc:/drill/container"
+      />
 
       {/* Main content */}
       <main className="container mx-auto px-4 py-8">

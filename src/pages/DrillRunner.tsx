@@ -15,7 +15,7 @@ import {
   type TPAction,
 } from "@/core/engine/twoPointers";
 import { saveSession } from "@/lib/storage";
-import drillsData from "@/data/twoPointers.drills.json";
+import { generateTwoPointersDrill } from "@/lib/drillGenerator";
 import { RotateCcw, ArrowRight } from "lucide-react";
 
 interface DrillData {
@@ -43,13 +43,15 @@ const DrillRunner = () => {
     message: string;
   }>({ type: null, message: "" });
 
-  // Load drills on mount
+  // Generate random drills on mount
   useEffect(() => {
-    const set = drillsData.sets.find((s) => s.mode === mode);
-    if (set) {
-      setDrills(set.drills);
-      initializeDrill(set.drills[0]);
+    const newDrills: DrillData[] = [];
+    const count = mode === "micro" ? 10 : 5;
+    for (let i = 0; i < count; i++) {
+      newDrills.push(generateTwoPointersDrill("easy"));
     }
+    setDrills(newDrills);
+    initializeDrill(newDrills[0]);
   }, [mode]);
 
   const initializeDrill = (drill: DrillData) => {
@@ -138,20 +140,19 @@ const DrillRunner = () => {
       initializeDrill(drills[nextIndex]);
     } else {
       // Session complete - save and navigate to summary
-      const set = drillsData.sets.find((s) => s.mode === mode);
       const accuracy = drills.length > 0 ? (correctFirstTry / drills.length) * 100 : 0;
 
       saveSession({
         id: Date.now().toString(),
         date: new Date().toISOString(),
-        setId: set?.id || "",
+        setId: "random",
         mode: mode,
-        difficulty: set?.difficulty || "easy",
+        difficulty: "easy",
         totalDrills: drills.length,
         correctFirstTry,
         totalScore: score,
         longestCombo,
-        averageTime: 0, // TODO: Track time
+        averageTime: 0,
         accuracy,
       });
 

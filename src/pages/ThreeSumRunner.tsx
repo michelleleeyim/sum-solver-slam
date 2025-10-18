@@ -20,8 +20,10 @@ import {
   getHint,
   isFinished,
 } from "@/core/engine/threeSum";
-import drillsData from "@/data/threeSum.drills.json";
+import { generateThreeSumDrill } from "@/lib/drillGenerator";
 import { saveSessionSummary } from "@/lib/storage";
+
+const PROBLEM_DESCRIPTION = "Given an integer array nums and an integer k, return all unique triplets [nums[i], nums[j], nums[l]] such that their sum equals k.";
 
 const ThreeSumRunner = () => {
   const navigate = useNavigate();
@@ -38,14 +40,12 @@ const ThreeSumRunner = () => {
   const [startTime] = useState(Date.now());
 
   useEffect(() => {
-    loadDrill(0);
+    loadDrill();
   }, []);
 
-  const loadDrill = (index: number) => {
-    const drill = drillsData.sets[index];
-    if (drill) {
-      setState(initializeState(drill.nums, drill.target));
-    }
+  const loadDrill = () => {
+    const drill = generateThreeSumDrill("easy");
+    setState(initializeState(drill.nums, drill.target));
   };
 
   const handleAction = (action: ThreeSumAction) => {
@@ -120,7 +120,7 @@ const ThreeSumRunner = () => {
     setAccuracy(100);
     setTotalMoves(0);
     setCorrectMoves(0);
-    loadDrill(drillIndex);
+    loadDrill();
     setFeedback({ type: null, message: "" });
   };
 
@@ -177,12 +177,10 @@ const ThreeSumRunner = () => {
         </motion.div>
 
         {/* Problem Description */}
-        {drillsData.problemDescription && (
-          <ProblemDescription
-            description={drillsData.problemDescription}
-            storageKey="hideDesc:/drill/three-sum"
-          />
-        )}
+        <ProblemDescription
+          description={PROBLEM_DESCRIPTION}
+          storageKey="hideDesc:/drill/three-sum"
+        />
 
         {/* Main Content */}
         <div className="grid lg:grid-cols-3 gap-6">
