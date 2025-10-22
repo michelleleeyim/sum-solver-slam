@@ -13,7 +13,7 @@ const Index = () => {
   const arrayProblems = [
     { name: "Contains Duplicate", path: "/drill/contains-duplicate", color: "red" },
     { name: "Valid Anagram", path: "/drill/valid-anagram", color: "blue" },
-    { name: "Two Sum", path: "#", color: "orange", disabled: true },
+    { name: "Two Sum", path: "/drill/two-sum", color: "orange" },
     { name: "Group Anagrams", path: "#", color: "purple", disabled: true },
     { name: "Top K Frequent Elements", path: "#", color: "pink", disabled: true },
     { name: "Encode & Decode Strings", path: "#", color: "cyan", disabled: true },

@@ -15,6 +15,7 @@ import PalindromeSummary from "./pages/PalindromeSummary";
 import ValidAnagramRunner from "./pages/ValidAnagramRunner";
 import ValidAnagramSummary from "./pages/ValidAnagramSummary";
 import ContainsDuplicateRunner from "./pages/ContainsDuplicateRunner";
+import TwoSumRunner from "./pages/TwoSumRunner";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,6 +39,7 @@ const App = () => (
           <Route path="/drill/valid-anagram" element={<ValidAnagramRunner />} />
           <Route path="/summary/valid-anagram" element={<ValidAnagramSummary />} />
           <Route path="/drill/contains-duplicate" element={<ContainsDuplicateRunner />} />
+          <Route path="/drill/two-sum" element={<TwoSumRunner />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
