@@ -1,0 +1,14 @@
+{
+  "problemId": "valid-anagram",
+  "title": "Valid Anagram",
+  "problemDescription": "Given two strings s and t, return true if t is an anagram of s, and false otherwise.",
+  "seeds": [
+    { "s": "anagram", "t": "nagaram" },
+    { "s": "rat", "t": "car" },
+    { "s": "aacc", "t": "ccac" },
+    { "s": "listen", "t": "silent" },
+    { "s": "hello", "t": "world" },
+    { "s": "abc", "t": "bca" },
+    { "s": "aabbcc", "t": "abcabc" }
+  ]
+}

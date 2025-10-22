@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowRight, Target, Zap, Trophy, Layers, Container, Text } from "lucide-react";
+import { ArrowRight, Target, Zap, Trophy, Layers, Container, Text, Hash } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
@@ -262,6 +262,61 @@ const Index = () => {
                   <Link to="/drill/palindrome?mode=mini">Multi-Step (Mini)</Link>
                 </Button>
               </div>
+            </Card>
+          </motion.div>
+
+          {/* Valid Anagram Card */}
+          <motion.div
+            initial={{ y: 40, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.6, duration: 0.5 }}
+          >
+            <Card className="p-8 shadow-xl bg-gradient-to-br from-card to-card/80 border-2 border-blue-500/20 h-full">
+              <div className="flex items-start gap-4 mb-6">
+                <div className="p-3 rounded-2xl bg-blue-500/10">
+                  <Hash className="h-8 w-8 text-blue-500" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold mb-2 text-card-foreground">
+                    Valid Anagram – Frequency Map
+                  </h2>
+                  <p className="text-muted-foreground">
+                    Learn the optimal O(n) hash counting approach for anagram detection. 
+                    Compare it with O(n log n) sorting and earn bonus XP for the faster method!
+                  </p>
+                </div>
+              </div>
+
+              {/* Stats Preview */}
+              <div className="grid grid-cols-3 gap-4 mb-6 p-4 bg-secondary/50 rounded-xl">
+                <div className="text-center">
+                  <Zap className="h-5 w-5 text-blue-500 mx-auto mb-1" />
+                  <p className="text-sm text-muted-foreground">Duration</p>
+                  <p className="text-lg font-bold text-card-foreground">12 min</p>
+                </div>
+                <div className="text-center">
+                  <Trophy className="h-5 w-5 text-accent mx-auto mb-1" />
+                  <p className="text-sm text-muted-foreground">Skill Level</p>
+                  <p className="text-lg font-bold text-card-foreground">Beginner</p>
+                </div>
+                <div className="text-center">
+                  <Hash className="h-5 w-5 text-blue-500 mx-auto mb-1" />
+                  <p className="text-sm text-muted-foreground">Seeds</p>
+                  <p className="text-lg font-bold text-card-foreground">7</p>
+                </div>
+              </div>
+
+              {/* Action Button */}
+              <Button
+                asChild
+                size="lg"
+                className="w-full h-14 text-lg font-bold bg-gradient-to-r from-blue-500 to-blue-600 hover:opacity-90 text-white shadow-lg"
+              >
+                <Link to="/drill/valid-anagram">
+                  Start Anagram Drill
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
             </Card>
           </motion.div>
         </div>

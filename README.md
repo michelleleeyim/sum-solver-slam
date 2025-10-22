@@ -26,6 +26,12 @@ Train algorithm instincts visually through interactive micro-puzzles. Master poi
    - Skip non-alphanumeric characters and compare case-insensitively
    - Learn when to skip vs. when to compare
 
+5. **Valid Anagram – Frequency Map** (Beginner)
+   - Learn the optimal O(n) hash counting approach for anagram detection
+   - Compare Counting mode (O(n)) vs Sorting mode (O(n log n))
+   - Visualize live frequency table updates as you process characters
+   - Earn bonus XP for staying in the optimal counting mode
+
 ### Problem Descriptions
 
 Each drill optionally displays a short problem statement (no hints) above the interactive board. The description is loaded from the drill's data JSON via `problemDescription` field. Users can toggle visibility with the "?" button, and the preference is saved in localStorage.

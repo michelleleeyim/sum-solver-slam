@@ -12,6 +12,8 @@ import ContainerRunner from "./pages/ContainerRunner";
 import ContainerSummary from "./pages/ContainerSummary";
 import PalindromeRunner from "./pages/PalindromeRunner";
 import PalindromeSummary from "./pages/PalindromeSummary";
+import ValidAnagramRunner from "./pages/ValidAnagramRunner";
+import ValidAnagramSummary from "./pages/ValidAnagramSummary";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +34,8 @@ const App = () => (
           <Route path="/summary/container" element={<ContainerSummary />} />
           <Route path="/drill/palindrome" element={<PalindromeRunner />} />
           <Route path="/summary/palindrome" element={<PalindromeSummary />} />
+          <Route path="/drill/valid-anagram" element={<ValidAnagramRunner />} />
+          <Route path="/summary/valid-anagram" element={<ValidAnagramSummary />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
