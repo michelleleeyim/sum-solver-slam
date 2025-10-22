@@ -1,0 +1,30 @@
+{
+  "problemDescription": "Given a string s, determine if it is a palindrome, considering only alphanumeric characters and ignoring case.",
+  "sets": [
+    {
+      "id": "pal_micro_01",
+      "mode": "micro",
+      "drills": [
+        { "s": "A man, a plan, a canal: Panama", "L": 0, "R": 29 },
+        { "s": "race a car", "L": 0, "R": 8 },
+        { "s": ".,! noon !,.", "L": 0, "R": 11 },
+        { "s": "Was it a car or a cat I saw?", "L": 0, "R": 26 },
+        { "s": "Madam", "L": 0, "R": 4 },
+        { "s": "Hello World", "L": 0, "R": 10 },
+        { "s": "12321", "L": 0, "R": 4 },
+        { "s": "A1B2C2B1A", "L": 0, "R": 8 }
+      ]
+    },
+    {
+      "id": "pal_mini_01",
+      "mode": "mini",
+      "drills": [
+        { "s": "A man, a plan, a canal: Panama", "L": 0, "R": 29 },
+        { "s": "No lemon, no melon", "L": 0, "R": 17 },
+        { "s": "race a car", "L": 0, "R": 8 },
+        { "s": "Was it a car or a cat I saw?", "L": 0, "R": 26 },
+        { "s": "Hello World", "L": 0, "R": 10 }
+      ]
+    }
+  ]
+}

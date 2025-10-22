@@ -10,6 +10,8 @@ import ThreeSumRunner from "./pages/ThreeSumRunner";
 import ThreeSumSummary from "./pages/ThreeSumSummary";
 import ContainerRunner from "./pages/ContainerRunner";
 import ContainerSummary from "./pages/ContainerSummary";
+import PalindromeRunner from "./pages/PalindromeRunner";
+import PalindromeSummary from "./pages/PalindromeSummary";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +30,8 @@ const App = () => (
           <Route path="/summary/three-sum" element={<ThreeSumSummary />} />
           <Route path="/drill/container" element={<ContainerRunner />} />
           <Route path="/summary/container" element={<ContainerSummary />} />
+          <Route path="/drill/palindrome" element={<PalindromeRunner />} />
+          <Route path="/summary/palindrome" element={<PalindromeSummary />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

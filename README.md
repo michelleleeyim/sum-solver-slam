@@ -21,6 +21,11 @@ Train algorithm instincts visually through interactive micro-puzzles. Master poi
    - Always move the shorter line to maximize area
    - Visualize water containers between vertical bars
 
+4. **Valid Palindrome** (Beginner)
+   - Master string-based two pointers with character filtering
+   - Skip non-alphanumeric characters and compare case-insensitively
+   - Learn when to skip vs. when to compare
+
 ### Problem Descriptions
 
 Each drill optionally displays a short problem statement (no hints) above the interactive board. The description is loaded from the drill's data JSON via `problemDescription` field. Users can toggle visibility with the "?" button, and the preference is saved in localStorage.

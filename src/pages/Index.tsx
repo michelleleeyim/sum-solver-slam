@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowRight, Target, Zap, Trophy, Layers, Container } from "lucide-react";
+import { ArrowRight, Target, Zap, Trophy, Layers, Container, Text } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
@@ -197,6 +197,71 @@ const Index = () => {
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
+            </Card>
+          </motion.div>
+
+          {/* Palindrome Card */}
+          <motion.div
+            initial={{ y: 40, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+          >
+            <Card className="p-8 shadow-xl bg-gradient-to-br from-card to-card/80 border-2 border-green-500/20 h-full">
+              <div className="flex items-start gap-4 mb-6">
+                <div className="p-3 rounded-2xl bg-green-500/10">
+                  <Text className="h-8 w-8 text-green-500" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold mb-2 text-card-foreground">
+                    Valid Palindrome
+                  </h2>
+                  <p className="text-muted-foreground">
+                    Master string-based two pointers by skipping non-alphanumeric characters and 
+                    comparing case-insensitively. Learn when to skip and when to compare!
+                  </p>
+                </div>
+              </div>
+
+              {/* Stats Preview */}
+              <div className="grid grid-cols-3 gap-4 mb-6 p-4 bg-secondary/50 rounded-xl">
+                <div className="text-center">
+                  <Zap className="h-5 w-5 text-green-500 mx-auto mb-1" />
+                  <p className="text-sm text-muted-foreground">Duration</p>
+                  <p className="text-lg font-bold text-card-foreground">8 min</p>
+                </div>
+                <div className="text-center">
+                  <Trophy className="h-5 w-5 text-accent mx-auto mb-1" />
+                  <p className="text-sm text-muted-foreground">Skill Level</p>
+                  <p className="text-lg font-bold text-card-foreground">Beginner</p>
+                </div>
+                <div className="text-center">
+                  <Text className="h-5 w-5 text-green-500 mx-auto mb-1" />
+                  <p className="text-sm text-muted-foreground">Drills</p>
+                  <p className="text-lg font-bold text-card-foreground">10+</p>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col gap-3">
+                <Button
+                  asChild
+                  size="lg"
+                  className="h-14 text-lg font-bold bg-gradient-to-r from-green-500 to-green-600 hover:opacity-90 text-white shadow-lg"
+                >
+                  <Link to="/drill/palindrome?mode=micro">
+                    Quick Drill (Micro)
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+                <Button
+                  asChild
+                  size="lg"
+                  variant="outline"
+                  className="h-14 text-lg font-bold border-2 border-green-500 text-green-500 hover:bg-green-500/10"
+                >
+                  <Link to="/drill/palindrome?mode=mini">Multi-Step (Mini)</Link>
+                </Button>
+              </div>
             </Card>
           </motion.div>
         </div>
