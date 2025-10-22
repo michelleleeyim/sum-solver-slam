@@ -1,10 +1,33 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowRight, Target, Zap, Trophy, Layers, Container, Text, Hash } from "lucide-react";
+import { ArrowRight, Target, Hash, FolderOpen, ChevronDown, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { useState } from "react";
 
 const Index = () => {
+  const [arraysOpen, setArraysOpen] = useState(false);
+  const [pointersOpen, setPointersOpen] = useState(false);
+
+  const arrayProblems = [
+    { name: "Contains Duplicate", path: "/drill/contains-duplicate", color: "red" },
+    { name: "Valid Anagram", path: "/drill/valid-anagram", color: "blue" },
+    { name: "Two Sum", path: "#", color: "orange", disabled: true },
+    { name: "Group Anagrams", path: "#", color: "purple", disabled: true },
+    { name: "Top K Frequent Elements", path: "#", color: "pink", disabled: true },
+    { name: "Encode & Decode Strings", path: "#", color: "cyan", disabled: true },
+    { name: "Product of Array Except Self", path: "#", color: "indigo", disabled: true },
+    { name: "Longest Consecutive Sequence", path: "#", color: "teal", disabled: true },
+  ];
+
+  const pointerProblems = [
+    { name: "Valid Palindrome", path: "/drill/palindrome", color: "green" },
+    { name: "Container With Most Water", path: "/drill/container", color: "yellow" },
+    { name: "3Sum", path: "/drill/three-sum", color: "violet" },
+    { name: "Trapping Rain Water", path: "#", color: "blue", disabled: true },
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary">
       <div className="container max-w-4xl mx-auto px-4 py-12">
@@ -23,301 +46,126 @@ const Index = () => {
           </p>
         </motion.div>
 
-        {/* Category Cards */}
-        <div className="grid md:grid-cols-2 gap-6 mb-12">
-          {/* Two Pointers Card */}
+        {/* Category Folders */}
+        <div className="space-y-6 mb-12">
+          {/* Arrays & Hashing Folder */}
           <motion.div
             initial={{ y: 40, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
           >
-            <Card className="p-8 shadow-xl bg-gradient-to-br from-card to-card/80 border-2 border-primary/20 h-full">
-              <div className="flex items-start gap-4 mb-6">
-                <div className="p-3 rounded-2xl bg-primary/10">
-                  <Target className="h-8 w-8 text-primary" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold mb-2 text-card-foreground">
-                    Two Pointers – Pair Sum
-                  </h2>
-                  <p className="text-muted-foreground">
-                    Learn the classic two-pointer technique for finding pairs in sorted arrays. Make
-                    split-second decisions: move left, move right, or claim victory.
-                  </p>
-                </div>
-              </div>
-
-              {/* Stats Preview */}
-              <div className="grid grid-cols-3 gap-4 mb-6 p-4 bg-secondary/50 rounded-xl">
-                <div className="text-center">
-                  <Zap className="h-5 w-5 text-primary mx-auto mb-1" />
-                  <p className="text-sm text-muted-foreground">Quick Drills</p>
-                  <p className="text-lg font-bold text-card-foreground">10 min</p>
-                </div>
-                <div className="text-center">
-                  <Trophy className="h-5 w-5 text-accent mx-auto mb-1" />
-                  <p className="text-sm text-muted-foreground">Skill Level</p>
-                  <p className="text-lg font-bold text-card-foreground">Beginner</p>
-                </div>
-                <div className="text-center">
-                  <Target className="h-5 w-5 text-primary mx-auto mb-1" />
-                  <p className="text-sm text-muted-foreground">Drills</p>
-                  <p className="text-lg font-bold text-card-foreground">20+</p>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex flex-col gap-3">
-                <Button
-                  asChild
-                  size="lg"
-                  className="h-14 text-lg font-bold bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 text-primary-foreground shadow-lg"
-                >
-                  <Link to="/drill/two-pointers?mode=micro">
-                    Quick Drill (Micro)
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Link>
-                </Button>
-                <Button
-                  asChild
-                  size="lg"
-                  variant="outline"
-                  className="h-14 text-lg font-bold border-2 border-primary text-primary hover:bg-primary/10"
-                >
-                  <Link to="/drill/two-pointers?mode=mini">Multi-Step (Mini)</Link>
-                </Button>
-              </div>
-            </Card>
+            <Collapsible open={arraysOpen} onOpenChange={setArraysOpen}>
+              <Card className="p-6 shadow-xl bg-gradient-to-br from-card to-card/80 border-2 border-primary/20">
+                <CollapsibleTrigger className="w-full">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 rounded-2xl bg-primary/10">
+                        <Hash className="h-8 w-8 text-primary" />
+                      </div>
+                      <div className="text-left">
+                        <h2 className="text-2xl font-bold text-card-foreground flex items-center gap-2">
+                          Arrays & Hashing
+                          {arraysOpen ? <ChevronDown className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
+                        </h2>
+                        <p className="text-sm text-muted-foreground">
+                          {arrayProblems.length} problems · Hash sets, frequency maps, prefix sums
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <div className="mt-6 grid gap-3">
+                    {arrayProblems.map((problem, idx) => (
+                      <motion.div
+                        key={problem.name}
+                        initial={{ x: -20, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: 0.1 * idx }}
+                      >
+                        {problem.disabled ? (
+                          <Card className="p-4 bg-secondary/30 border border-muted opacity-60">
+                            <div className="flex items-center justify-between">
+                              <span className="font-medium text-muted-foreground">{problem.name}</span>
+                              <span className="text-xs text-muted-foreground">Coming Soon</span>
+                            </div>
+                          </Card>
+                        ) : (
+                          <Link to={problem.path}>
+                            <Card className="p-4 bg-secondary/50 hover:bg-secondary/80 transition-all hover:scale-[1.02] border border-muted hover:border-primary/50">
+                              <div className="flex items-center justify-between">
+                                <span className="font-medium text-card-foreground">{problem.name}</span>
+                                <ArrowRight className="h-4 w-4 text-primary" />
+                              </div>
+                            </Card>
+                          </Link>
+                        )}
+                      </motion.div>
+                    ))}
+                  </div>
+                </CollapsibleContent>
+              </Card>
+            </Collapsible>
           </motion.div>
 
-          {/* 3Sum Card */}
+          {/* Two Pointers Folder */}
           <motion.div
             initial={{ y: 40, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.5 }}
           >
-            <Card className="p-8 shadow-xl bg-gradient-to-br from-card to-card/80 border-2 border-purple-500/20 h-full">
-              <div className="flex items-start gap-4 mb-6">
-                <div className="p-3 rounded-2xl bg-purple-500/10">
-                  <Layers className="h-8 w-8 text-purple-500" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold mb-2 text-card-foreground">
-                    3Sum Pattern – Nested Two Pointers
-                  </h2>
-                  <p className="text-muted-foreground">
-                    Master the nested pointer technique by fixing one element and applying two-pointer
-                    logic to find triplets. Level up your algorithm skills!
-                  </p>
-                </div>
-              </div>
-
-              {/* Stats Preview */}
-              <div className="grid grid-cols-3 gap-4 mb-6 p-4 bg-secondary/50 rounded-xl">
-                <div className="text-center">
-                  <Zap className="h-5 w-5 text-purple-500 mx-auto mb-1" />
-                  <p className="text-sm text-muted-foreground">Duration</p>
-                  <p className="text-lg font-bold text-card-foreground">15 min</p>
-                </div>
-                <div className="text-center">
-                  <Trophy className="h-5 w-5 text-accent mx-auto mb-1" />
-                  <p className="text-sm text-muted-foreground">Skill Level</p>
-                  <p className="text-lg font-bold text-card-foreground">Intermediate</p>
-                </div>
-                <div className="text-center">
-                  <Layers className="h-5 w-5 text-purple-500 mx-auto mb-1" />
-                  <p className="text-sm text-muted-foreground">Drills</p>
-                  <p className="text-lg font-bold text-card-foreground">5+</p>
-                </div>
-              </div>
-
-              {/* Action Button */}
-              <Button
-                asChild
-                size="lg"
-                className="w-full h-14 text-lg font-bold bg-gradient-to-r from-purple-500 to-purple-600 hover:opacity-90 text-white shadow-lg"
-              >
-                <Link to="/drill/three-sum">
-                  Start 3Sum Drill
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-            </Card>
-          </motion.div>
-
-          {/* Container Card */}
-          <motion.div
-            initial={{ y: 40, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.5 }}
-          >
-            <Card className="p-8 shadow-xl bg-gradient-to-br from-card to-card/80 border-2 border-accent/20 h-full">
-              <div className="flex items-start gap-4 mb-6">
-                <div className="p-3 rounded-2xl bg-accent/10">
-                  <Container className="h-8 w-8 text-accent" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold mb-2 text-card-foreground">
-                    Container With Most Water
-                  </h2>
-                  <p className="text-muted-foreground">
-                    Master the greedy two-pointer approach by always moving the shorter line. 
-                    Visualize how to maximize area between vertical lines.
-                  </p>
-                </div>
-              </div>
-
-              {/* Stats Preview */}
-              <div className="grid grid-cols-3 gap-4 mb-6 p-4 bg-secondary/50 rounded-xl">
-                <div className="text-center">
-                  <Zap className="h-5 w-5 text-accent mx-auto mb-1" />
-                  <p className="text-sm text-muted-foreground">Duration</p>
-                  <p className="text-lg font-bold text-card-foreground">10 min</p>
-                </div>
-                <div className="text-center">
-                  <Trophy className="h-5 w-5 text-accent mx-auto mb-1" />
-                  <p className="text-sm text-muted-foreground">Skill Level</p>
-                  <p className="text-lg font-bold text-card-foreground">Intermediate</p>
-                </div>
-                <div className="text-center">
-                  <Container className="h-5 w-5 text-accent mx-auto mb-1" />
-                  <p className="text-sm text-muted-foreground">Drills</p>
-                  <p className="text-lg font-bold text-card-foreground">15+</p>
-                </div>
-              </div>
-
-              {/* Action Button */}
-              <Button
-                asChild
-                size="lg"
-                className="w-full h-14 text-lg font-bold bg-gradient-to-r from-accent to-accent/80 hover:opacity-90 text-accent-foreground shadow-lg"
-              >
-                <Link to="/drill/container">
-                  Start Container Drill
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-            </Card>
-          </motion.div>
-
-          {/* Palindrome Card */}
-          <motion.div
-            initial={{ y: 40, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.5, duration: 0.5 }}
-          >
-            <Card className="p-8 shadow-xl bg-gradient-to-br from-card to-card/80 border-2 border-green-500/20 h-full">
-              <div className="flex items-start gap-4 mb-6">
-                <div className="p-3 rounded-2xl bg-green-500/10">
-                  <Text className="h-8 w-8 text-green-500" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold mb-2 text-card-foreground">
-                    Valid Palindrome
-                  </h2>
-                  <p className="text-muted-foreground">
-                    Master string-based two pointers by skipping non-alphanumeric characters and 
-                    comparing case-insensitively. Learn when to skip and when to compare!
-                  </p>
-                </div>
-              </div>
-
-              {/* Stats Preview */}
-              <div className="grid grid-cols-3 gap-4 mb-6 p-4 bg-secondary/50 rounded-xl">
-                <div className="text-center">
-                  <Zap className="h-5 w-5 text-green-500 mx-auto mb-1" />
-                  <p className="text-sm text-muted-foreground">Duration</p>
-                  <p className="text-lg font-bold text-card-foreground">8 min</p>
-                </div>
-                <div className="text-center">
-                  <Trophy className="h-5 w-5 text-accent mx-auto mb-1" />
-                  <p className="text-sm text-muted-foreground">Skill Level</p>
-                  <p className="text-lg font-bold text-card-foreground">Beginner</p>
-                </div>
-                <div className="text-center">
-                  <Text className="h-5 w-5 text-green-500 mx-auto mb-1" />
-                  <p className="text-sm text-muted-foreground">Drills</p>
-                  <p className="text-lg font-bold text-card-foreground">10+</p>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex flex-col gap-3">
-                <Button
-                  asChild
-                  size="lg"
-                  className="h-14 text-lg font-bold bg-gradient-to-r from-green-500 to-green-600 hover:opacity-90 text-white shadow-lg"
-                >
-                  <Link to="/drill/palindrome?mode=micro">
-                    Quick Drill (Micro)
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Link>
-                </Button>
-                <Button
-                  asChild
-                  size="lg"
-                  variant="outline"
-                  className="h-14 text-lg font-bold border-2 border-green-500 text-green-500 hover:bg-green-500/10"
-                >
-                  <Link to="/drill/palindrome?mode=mini">Multi-Step (Mini)</Link>
-                </Button>
-              </div>
-            </Card>
-          </motion.div>
-
-          {/* Valid Anagram Card */}
-          <motion.div
-            initial={{ y: 40, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.6, duration: 0.5 }}
-          >
-            <Card className="p-8 shadow-xl bg-gradient-to-br from-card to-card/80 border-2 border-blue-500/20 h-full">
-              <div className="flex items-start gap-4 mb-6">
-                <div className="p-3 rounded-2xl bg-blue-500/10">
-                  <Hash className="h-8 w-8 text-blue-500" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold mb-2 text-card-foreground">
-                    Valid Anagram – Frequency Map
-                  </h2>
-                  <p className="text-muted-foreground">
-                    Learn the optimal O(n) hash counting approach for anagram detection. 
-                    Compare it with O(n log n) sorting and earn bonus XP for the faster method!
-                  </p>
-                </div>
-              </div>
-
-              {/* Stats Preview */}
-              <div className="grid grid-cols-3 gap-4 mb-6 p-4 bg-secondary/50 rounded-xl">
-                <div className="text-center">
-                  <Zap className="h-5 w-5 text-blue-500 mx-auto mb-1" />
-                  <p className="text-sm text-muted-foreground">Duration</p>
-                  <p className="text-lg font-bold text-card-foreground">12 min</p>
-                </div>
-                <div className="text-center">
-                  <Trophy className="h-5 w-5 text-accent mx-auto mb-1" />
-                  <p className="text-sm text-muted-foreground">Skill Level</p>
-                  <p className="text-lg font-bold text-card-foreground">Beginner</p>
-                </div>
-                <div className="text-center">
-                  <Hash className="h-5 w-5 text-blue-500 mx-auto mb-1" />
-                  <p className="text-sm text-muted-foreground">Seeds</p>
-                  <p className="text-lg font-bold text-card-foreground">7</p>
-                </div>
-              </div>
-
-              {/* Action Button */}
-              <Button
-                asChild
-                size="lg"
-                className="w-full h-14 text-lg font-bold bg-gradient-to-r from-blue-500 to-blue-600 hover:opacity-90 text-white shadow-lg"
-              >
-                <Link to="/drill/valid-anagram">
-                  Start Anagram Drill
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-            </Card>
+            <Collapsible open={pointersOpen} onOpenChange={setPointersOpen}>
+              <Card className="p-6 shadow-xl bg-gradient-to-br from-card to-card/80 border-2 border-accent/20">
+                <CollapsibleTrigger className="w-full">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 rounded-2xl bg-accent/10">
+                        <Target className="h-8 w-8 text-accent" />
+                      </div>
+                      <div className="text-left">
+                        <h2 className="text-2xl font-bold text-card-foreground flex items-center gap-2">
+                          Two Pointers
+                          {pointersOpen ? <ChevronDown className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
+                        </h2>
+                        <p className="text-sm text-muted-foreground">
+                          {pointerProblems.length} problems · Opposite ends, sliding window, fast-slow
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <div className="mt-6 grid gap-3">
+                    {pointerProblems.map((problem, idx) => (
+                      <motion.div
+                        key={problem.name}
+                        initial={{ x: -20, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: 0.1 * idx }}
+                      >
+                        {problem.disabled ? (
+                          <Card className="p-4 bg-secondary/30 border border-muted opacity-60">
+                            <div className="flex items-center justify-between">
+                              <span className="font-medium text-muted-foreground">{problem.name}</span>
+                              <span className="text-xs text-muted-foreground">Coming Soon</span>
+                            </div>
+                          </Card>
+                        ) : (
+                          <Link to={problem.path}>
+                            <Card className="p-4 bg-secondary/50 hover:bg-secondary/80 transition-all hover:scale-[1.02] border border-muted hover:border-accent/50">
+                              <div className="flex items-center justify-between">
+                                <span className="font-medium text-card-foreground">{problem.name}</span>
+                                <ArrowRight className="h-4 w-4 text-accent" />
+                              </div>
+                            </Card>
+                          </Link>
+                        )}
+                      </motion.div>
+                    ))}
+                  </div>
+                </CollapsibleContent>
+              </Card>
+            </Collapsible>
           </motion.div>
         </div>
 
@@ -336,9 +184,9 @@ const Index = () => {
                   1
                 </div>
                 <div>
-                  <h4 className="font-bold text-card-foreground mb-1">See the array & target</h4>
+                  <h4 className="font-bold text-card-foreground mb-1">Choose a category</h4>
                   <p className="text-muted-foreground text-sm">
-                    You'll see a sorted array with two pointers (L and R) and a target sum to find.
+                    Click on Arrays & Hashing or Two Pointers to see available problems.
                   </p>
                 </div>
               </div>
@@ -347,10 +195,9 @@ const Index = () => {
                   2
                 </div>
                 <div>
-                  <h4 className="font-bold text-card-foreground mb-1">Choose your move</h4>
+                  <h4 className="font-bold text-card-foreground mb-1">Pick a problem</h4>
                   <p className="text-muted-foreground text-sm">
-                    If the sum is too small, move left pointer right (L++). If too large, move
-                    right pointer left (R--). If equal, claim "Found Pair!"
+                    Each problem has a unique drill that teaches you the optimal solution through interactive visualization.
                   </p>
                 </div>
               </div>
@@ -359,10 +206,9 @@ const Index = () => {
                   3
                 </div>
                 <div>
-                  <h4 className="font-bold text-card-foreground mb-1">Get instant feedback</h4>
+                  <h4 className="font-bold text-card-foreground mb-1">Master the pattern</h4>
                   <p className="text-muted-foreground text-sm">
-                    Correct moves earn points and build your combo. Mistakes show helpful hints. No
-                    dead ends—you can always retry.
+                    Get instant feedback on your moves, build intuition, and level up your algorithm skills!
                   </p>
                 </div>
               </div>
