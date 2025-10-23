@@ -1,8 +1,8 @@
 export type VAState = {
   s: string;
   t: string;
-  iS: number;   // next index in s
-  iT: number;   // next index in t
+  iS: number; // next index in s
+  iT: number; // next index in t
   freq: Record<string, number>; // char -> count
   mode: "count" | "sort";
   decided?: boolean;
@@ -11,14 +11,7 @@ export type VAState = {
   sortedT?: string;
 };
 
-export type VAAction =
-  | "PROCESS_S"
-  | "PROCESS_T"
-  | "CHECK"
-  | "TOGGLE_MODE"
-  | "SORT_S"
-  | "SORT_T"
-  | "RESTART";
+export type VAAction = "PROCESS_S" | "PROCESS_T" | "CHECK" | "TOGGLE_MODE" | "SORT_S" | "SORT_T" | "RESTART";
 
 export function initVA(s: string, t: string): VAState {
   return { s, t, iS: 0, iT: 0, freq: {}, mode: "count" };
@@ -56,7 +49,7 @@ export function nextState(state: VAState, a: VAAction): VAState {
     if (a === "CHECK") {
       const done = state.iS >= state.s.length && state.iT >= state.t.length;
       if (!done) return state; // ignore until processed both
-      const ok = Object.values(state.freq).every(v => v === 0);
+      const ok = Object.values(state.freq).every((v) => v === 0);
       return { ...state, decided: true, isAnagram: ok };
     }
     return state;

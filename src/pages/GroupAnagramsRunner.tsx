@@ -1,68 +1,83 @@
-import { useState, useEffect, useReducer, useCallback } from "react";
+import { useState, useEffect, useReducer, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { RotateCcw, Shuffle, Check, Eye, EyeOff, Clock, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AnagramBinsBoard } from "@/components/drill/AnagramBinsBoard";
 import { ProblemDescription } from "@/components/drill/ProblemDescription";
-import { reducer, initGA, canAssign, GAState } from "@/core/engine/groupAnagrams";
+import { reducer, initGA, canAssign } from "@/core/engine/groupAnagrams";
 import { generateAnagramSet } from "@/core/utils/anagramSeed";
 import problemData from "@/data/group-anagrams.drills.json";
 
 export default function GroupAnagramsRunner() {
   const navigate = useNavigate();
+
+  // Seed words for the current run
   const [currentWords, setCurrentWords] = useState<string[]>([]);
-  const [state, dispatch] = useReducer(reducer, null as unknown as GAState);
+
+  // ✅ Lazy init: guarantees a non-null initial state on first render
+  const initArg = useMemo(() => ({ words: [] as string[], mode: "count" as const }), []);
+  const [state, dispatch] = useReducer(reducer, initArg, (arg) => initGA(arg.words, arg.mode));
+
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{ wordId: string; binId: string; ok: boolean } | null>(null);
-  const [startTime] = useState(Date.now());
+
+  // time tracking
+  const [startTime, setStartTime] = useState(() => Date.now());
   const [elapsedTime, setElapsedTime] = useState(0);
 
-  // Initialize with a random set
+  // Initial load: generate words, hydrate reducer
   useEffect(() => {
     const words = generateAnagramSet(problemData as any);
     setCurrentWords(words);
   }, []);
 
-  // Initialize state when words change
+  // Whenever currentWords changes, hydrate state with a new set
   useEffect(() => {
     if (currentWords.length > 0) {
-      const initialState = initGA(currentWords, "count");
       dispatch({ type: "NEW_SET", items: currentWords });
+      setStartTime(Date.now()); // reset timer for the new set
+      setElapsedTime(0);
     }
   }, [currentWords]);
 
-  // Timer
+  // Timer (stops when decided)
   useEffect(() => {
-    if (!state || state.decided) return;
+    if (state.decided) return;
     const timer = setInterval(() => {
       setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
     }, 1000);
     return () => clearInterval(timer);
-  }, [state?.decided, startTime]);
+  }, [state.decided, startTime]);
 
-  const handleAssign = useCallback((wordId: string, binId: string) => {
-    if (!state) return;
-    
-    const wordObj = state.items.find(it => it.id === wordId);
-    if (!wordObj) return;
+  const handleAssign = useCallback(
+    (wordId: string, binId: string) => {
+      const wordObj = state.items.find((it) => it.id === wordId);
+      if (!wordObj) return;
 
-    const check = canAssign(state.bins, binId, wordObj.word, state.mode);
-    
-    // Show feedback
-    setFeedback({ wordId, binId, ok: check.ok });
-    setTimeout(() => setFeedback(null), 1000);
+      const check = canAssign(state.bins, binId, wordObj.word, state.mode);
 
-    if (check.ok) {
-      dispatch({ type: "ASSIGN", wordId, binId });
-      setSelectedWord(null);
-    }
-  }, [state]);
+      // Show feedback
+      setFeedback({ wordId, binId, ok: check.ok });
+      const t = setTimeout(() => setFeedback(null), 1000);
+      // optional cleanup pattern
+      // return () => clearTimeout(t);
+
+      if (check.ok) {
+        dispatch({ type: "ASSIGN", wordId, binId });
+        setSelectedWord(null);
+      }
+    },
+    [state],
+  );
 
   const handleRestart = () => {
+    // Restart with the current words
     dispatch({ type: "RESTART", items: currentWords });
     setSelectedWord(null);
     setFeedback(null);
+    setStartTime(Date.now());
+    setElapsedTime(0);
   };
 
   const handleNewSet = () => {
@@ -72,23 +87,10 @@ export default function GroupAnagramsRunner() {
     setFeedback(null);
   };
 
-  const handleFinish = () => {
-    dispatch({ type: "FINISH" });
-  };
-
-  const handleToggleMode = () => {
-    dispatch({ type: "TOGGLE_MODE" });
-  };
-
-  const handleToggleKeys = () => {
-    dispatch({ type: "TOGGLE_KEYS" });
-  };
-
-  const handleCreateBin = () => {
-    dispatch({ type: "CREATE_BIN" });
-  };
-
-  if (!state) return null;
+  const handleFinish = () => dispatch({ type: "FINISH" });
+  const handleToggleMode = () => dispatch({ type: "TOGGLE_MODE" });
+  const handleToggleKeys = () => dispatch({ type: "TOGGLE_KEYS" });
+  const handleCreateBin = () => dispatch({ type: "CREATE_BIN" });
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -120,23 +122,13 @@ export default function GroupAnagramsRunner() {
               </div>
             </div>
           </div>
-          
+
           <div className="flex gap-2">
-            <Button
-              onClick={handleRestart}
-              variant="outline"
-              size="sm"
-              className="gap-2"
-            >
+            <Button onClick={handleRestart} variant="outline" size="sm" className="gap-2">
               <RotateCcw className="h-4 w-4" />
               Restart
             </Button>
-            <Button
-              onClick={handleNewSet}
-              variant="outline"
-              size="sm"
-              className="gap-2"
-            >
+            <Button onClick={handleNewSet} variant="outline" size="sm" className="gap-2">
               <Shuffle className="h-4 w-4" />
               New Set
             </Button>
@@ -145,7 +137,7 @@ export default function GroupAnagramsRunner() {
 
         {/* Problem Description */}
         <ProblemDescription
-          description={problemData.problemDescription}
+          description={(problemData as any).problemDescription}
           storageKey="group-anagrams-desc-visible"
         />
 
@@ -156,41 +148,23 @@ export default function GroupAnagramsRunner() {
           className="flex flex-wrap gap-3 items-center justify-between p-4 bg-card rounded-lg border border-border"
         >
           <div className="flex gap-2">
-            <Button
-              onClick={handleToggleMode}
-              variant={state.mode === "count" ? "default" : "outline"}
-              size="sm"
-            >
+            <Button onClick={handleToggleMode} variant={state.mode === "count" ? "default" : "outline"} size="sm">
               {state.mode === "count" ? "Counting (O(n·k))" : "Sorting (O(n·k log k))"}
             </Button>
-            <Button
-              onClick={handleToggleKeys}
-              variant="outline"
-              size="sm"
-              className="gap-2"
-            >
+            <Button onClick={handleToggleKeys} variant="outline" size="sm" className="gap-2">
               {state.showKeys ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               {state.showKeys ? "Hide" : "Show"} Signatures
             </Button>
           </div>
-          
-          <Button
-            onClick={handleFinish}
-            disabled={state.items.length > 0}
-            className="gap-2"
-            size="sm"
-          >
+
+          <Button onClick={handleFinish} disabled={state.items.length > 0} className="gap-2" size="sm">
             <Check className="h-4 w-4" />
             Finish
           </Button>
         </motion.div>
 
         {/* Board */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
           <AnagramBinsBoard
             state={state}
             selectedWord={selectedWord}
@@ -251,11 +225,7 @@ export default function GroupAnagramsRunner() {
                 </Button>
               </div>
 
-              <Button
-                onClick={() => navigate("/")}
-                variant="ghost"
-                className="w-full"
-              >
+              <Button onClick={() => navigate("/")} variant="ghost" className="w-full">
                 Back to Home
               </Button>
             </motion.div>
