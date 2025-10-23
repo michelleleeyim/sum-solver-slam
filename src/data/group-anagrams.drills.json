@@ -1,0 +1,18 @@
+{
+  "problemId": "group-anagrams",
+  "title": "Group Anagrams",
+  "problemDescription": "Given an array of strings strs, group the anagrams together. Return the groups in any order.",
+  "bank": [
+    ["eat", "tea", "ate"],
+    ["tan", "nat"],
+    ["bat", "tab"],
+    ["arc", "car"],
+    ["peel", "leap"],
+    ["listen", "silent"],
+    ["dusty", "study"],
+    ["elbow", "below"],
+    ["state", "taste"],
+    ["inch", "chin"]
+  ],
+  "distractors": ["rat", "arts", "nope", "stone", "angel", "staple"]
+}

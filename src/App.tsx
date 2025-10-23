@@ -14,6 +14,7 @@ import PalindromeRunner from "./pages/PalindromeRunner";
 import PalindromeSummary from "./pages/PalindromeSummary";
 import ValidAnagramRunner from "./pages/ValidAnagramRunner";
 import ValidAnagramSummary from "./pages/ValidAnagramSummary";
+import GroupAnagramsRunner from "./pages/GroupAnagramsRunner";
 import ContainsDuplicateRunner from "./pages/ContainsDuplicateRunner";
 import TwoSumRunner from "./pages/TwoSumRunner";
 import NotFound from "./pages/NotFound";
@@ -36,8 +37,9 @@ const App = () => (
           <Route path="/summary/container" element={<ContainerSummary />} />
           <Route path="/drill/palindrome" element={<PalindromeRunner />} />
           <Route path="/summary/palindrome" element={<PalindromeSummary />} />
-          <Route path="/drill/valid-anagram" element={<ValidAnagramRunner />} />
-          <Route path="/summary/valid-anagram" element={<ValidAnagramSummary />} />
+        <Route path="/drill/valid-anagram" element={<ValidAnagramRunner />} />
+        <Route path="/summary/valid-anagram" element={<ValidAnagramSummary />} />
+        <Route path="/drill/group-anagrams" element={<GroupAnagramsRunner />} />
           <Route path="/drill/contains-duplicate" element={<ContainsDuplicateRunner />} />
           <Route path="/drill/two-sum" element={<TwoSumRunner />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -14,7 +14,7 @@ const Index = () => {
     { name: "Contains Duplicate", path: "/drill/contains-duplicate", color: "red" },
     { name: "Valid Anagram", path: "/drill/valid-anagram", color: "blue" },
     { name: "Two Sum", path: "/drill/two-sum", color: "orange" },
-    { name: "Group Anagrams", path: "#", color: "purple", disabled: true },
+    { name: "Group Anagrams", path: "/drill/group-anagrams", color: "purple" },
     { name: "Top K Frequent Elements", path: "#", color: "pink", disabled: true },
     { name: "Encode & Decode Strings", path: "#", color: "cyan", disabled: true },
     { name: "Product of Array Except Self", path: "#", color: "indigo", disabled: true },
