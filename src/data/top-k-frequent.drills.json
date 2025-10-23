@@ -1,0 +1,14 @@
+{
+  "problemId": "top-k-frequent-elements",
+  "title": "Top K Frequent Elements",
+  "problemDescription": "Given an integer array nums and an integer k, return the k most frequent elements.",
+  "seeds": [
+    { "nums": [1, 1, 1, 2, 2, 3], "k": 2 },
+    { "nums": [4, 4, 4, 4, 6, 6, 7, 7, 7, 8], "k": 3 },
+    { "nums": [1], "k": 1 },
+    { "nums": [1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 2, 3, 3, 3], "k": 2 },
+    { "nums": [5, 5, 5, 10, 10, 20, 20, 20, 20], "k": 2 },
+    { "nums": [7, 7, 8, 8, 8, 9, 9, 9, 9], "k": 1 },
+    { "nums": [2, 2, 2, 2, 3, 3, 3, 4, 4, 5], "k": 3 }
+  ]
+}

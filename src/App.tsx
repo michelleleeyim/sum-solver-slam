@@ -17,6 +17,7 @@ import ValidAnagramSummary from "./pages/ValidAnagramSummary";
 import GroupAnagramsRunner from "./pages/GroupAnagramsRunner";
 import ContainsDuplicateRunner from "./pages/ContainsDuplicateRunner";
 import TwoSumRunner from "./pages/TwoSumRunner";
+import TopKFrequentRunner from "./pages/TopKFrequentRunner";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,6 +43,7 @@ const App = () => (
         <Route path="/drill/group-anagrams" element={<GroupAnagramsRunner />} />
           <Route path="/drill/contains-duplicate" element={<ContainsDuplicateRunner />} />
           <Route path="/drill/two-sum" element={<TwoSumRunner />} />
+          <Route path="/drill/top-k-frequent" element={<TopKFrequentRunner />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
