@@ -15,9 +15,8 @@ export default function GroupAnagramsRunner() {
   // Seed words for the current run
   const [currentWords, setCurrentWords] = useState<string[]>([]);
 
-  // ✅ Lazy init: guarantees a non-null initial state on first render
-  const initArg = useMemo(() => ({ words: [] as string[], mode: "count" as const }), []);
-  const [state, dispatch] = useReducer(reducer, initArg, (arg) => initGA(arg.words, arg.mode));
+  // ✅ Direct initialization with a valid state
+  const [state, dispatch] = useReducer(reducer, initGA([], "count"));
 
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{ wordId: string; binId: string; ok: boolean } | null>(null);
@@ -43,12 +42,12 @@ export default function GroupAnagramsRunner() {
 
   // Timer (stops when decided)
   useEffect(() => {
-    if (state.decided) return;
+    if (!state || state.decided) return;
     const timer = setInterval(() => {
       setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
     }, 1000);
     return () => clearInterval(timer);
-  }, [state.decided, startTime]);
+  }, [state?.decided, startTime]);
 
   const handleAssign = useCallback(
     (wordId: string, binId: string) => {
