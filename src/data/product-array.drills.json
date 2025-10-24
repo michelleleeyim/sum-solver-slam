@@ -1,0 +1,13 @@
+{
+  "problemId": "product-of-array-except-self",
+  "title": "Product of Array Except Self",
+  "problemDescription": "Given an integer array nums, return an array answer such that answer[i] is equal to the product of all the elements of nums except nums[i]. Solve it without division and in O(n) time.",
+  "seeds": [
+    { "nums": [1, 2, 3, 4] },
+    { "nums": [2, 3, 4, 5] },
+    { "nums": [1, 1, 1, 1] },
+    { "nums": [5, 2, 3, 1, 6] },
+    { "nums": [3, 6, 2, 4] },
+    { "nums": [1, 2, 3, 4, 5, 6] }
+  ]
+}

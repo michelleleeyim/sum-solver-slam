@@ -17,7 +17,7 @@ const Index = () => {
     { name: "Group Anagrams", path: "/drill/group-anagrams", color: "purple" },
     { name: "Top K Frequent Elements", path: "/drill/top-k-frequent", color: "pink" },
     { name: "Encode & Decode Strings", path: "/drill/encode-decode", color: "cyan" },
-    { name: "Product of Array Except Self", path: "#", color: "indigo", disabled: true },
+    { name: "Product of Array Except Self", path: "/drill/product-array", color: "indigo" },
     { name: "Longest Consecutive Sequence", path: "#", color: "teal", disabled: true },
   ];
 

@@ -19,6 +19,7 @@ import ContainsDuplicateRunner from "./pages/ContainsDuplicateRunner";
 import TwoSumRunner from "./pages/TwoSumRunner";
 import TopKFrequentRunner from "./pages/TopKFrequentRunner";
 import EncodeDecodeRunner from "./pages/EncodeDecodeRunner";
+import ProductArrayRunner from "./pages/ProductArrayRunner";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -46,6 +47,7 @@ const App = () => (
           <Route path="/drill/two-sum" element={<TwoSumRunner />} />
           <Route path="/drill/top-k-frequent" element={<TopKFrequentRunner />} />
           <Route path="/drill/encode-decode" element={<EncodeDecodeRunner />} />
+          <Route path="/drill/product-array" element={<ProductArrayRunner />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
