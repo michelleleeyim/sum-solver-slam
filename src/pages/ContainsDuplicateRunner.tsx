@@ -1,415 +1,251 @@
-import { useState } from "react";
+import { useReducer, useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft, RefreshCw, Shuffle, PlayCircle } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, RotateCcw, Sparkles, CheckCircle2, XCircle, Code2, Lightbulb } from "lucide-react";
-import { Link } from "react-router-dom";
+import { ProblemDescription } from "@/components/drill/ProblemDescription";
+import { FeedbackTray } from "@/components/drill/FeedbackTray";
+import { ContainsDuplicateBoard } from "@/components/drill/ContainsDuplicateBoard";
+import { reducer, initContainsDuplicate, isFinished, getTimeElapsed, getResult } from "@/core/engine/containsDuplicate";
+import drillData from "@/data/contains-duplicate.drills.json";
 
-type Phase = "intro" | "warmup" | "code" | "concept" | "reflection" | "complete";
+export default function ContainsDuplicateRunner() {
+  const navigate = useNavigate();
+  const [elapsedTime, setElapsedTime] = useState(0);
 
-const testCases = [
-  { input: [1, 2, 3, 4], output: false },
-  { input: [1, 2, 3, 1], output: true },
-  { input: [5, 5, 5, 5], output: true },
-  { input: [9, 8, 7, 6], output: false },
-];
+  // Pick a random seed
+  const getRandomSeed = useCallback(() => {
+    const seeds = drillData.seeds;
+    return seeds[Math.floor(Math.random() * seeds.length)];
+  }, []);
 
-const ContainsDuplicateRunner = () => {
-  const [phase, setPhase] = useState<Phase>("intro");
-  const [currentTest, setCurrentTest] = useState(0);
-  const [userAnswer, setUserAnswer] = useState<boolean | null>(null);
-  const [showFeedback, setShowFeedback] = useState(false);
-  const [score, setScore] = useState(0);
+  const [currentSeed, setCurrentSeed] = useState(getRandomSeed);
+  const [state, dispatch] = useReducer(
+    reducer,
+    initContainsDuplicate(currentSeed.nums)
+  );
 
-  const handleAnswer = (answer: boolean) => {
-    setUserAnswer(answer);
-    setShowFeedback(true);
-    const correct = answer === testCases[currentTest].output;
-    if (correct) {
-      setScore(score + 10);
+  const [feedback, setFeedback] = useState<{ type: "correct" | "incorrect"; message: string } | null>(null);
+  const [showSummary, setShowSummary] = useState(false);
+
+  // Timer
+  useEffect(() => {
+    if (isFinished(state)) return;
+    const timer = setInterval(() => {
+      setElapsedTime(getTimeElapsed(state));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [state]);
+
+  // Show summary when finished
+  useEffect(() => {
+    if (isFinished(state)) {
+      setShowSummary(true);
     }
+  }, [state]);
+
+  const showFeedbackMessage = (type: "correct" | "incorrect", message: string) => {
+    setFeedback({ type, message });
+    setTimeout(() => setFeedback(null), 2000);
   };
 
-  const handleNext = () => {
-    if (phase === "warmup" && currentTest < testCases.length - 1) {
-      setCurrentTest(currentTest + 1);
-      setUserAnswer(null);
-      setShowFeedback(false);
-    } else if (phase === "warmup" && currentTest === testCases.length - 1) {
-      setPhase("code");
-      setShowFeedback(false);
+  const handleCheckNext = () => {
+    if (state.phase !== "scan" || state.idx >= state.nums.length) return;
+    
+    const currentNum = state.nums[state.idx];
+    const willFindDuplicate = state.seen.has(currentNum);
+    
+    dispatch({ type: "CHECK_NEXT" });
+    
+    if (willFindDuplicate) {
+      showFeedbackMessage("correct", `Found duplicate: ${currentNum}!`);
     } else {
-      const phases: Phase[] = ["intro", "warmup", "code", "concept", "reflection", "complete"];
-      const nextPhaseIndex = phases.indexOf(phase) + 1;
-      if (nextPhaseIndex < phases.length) {
-        setPhase(phases[nextPhaseIndex]);
-      }
+      showFeedbackMessage("correct", `Added ${currentNum} to HashSet`);
     }
   };
 
   const handleRestart = () => {
-    setPhase("intro");
-    setCurrentTest(0);
-    setUserAnswer(null);
-    setShowFeedback(false);
-    setScore(0);
+    dispatch({ type: "RESTART", nums: currentSeed.nums });
+    setShowSummary(false);
+    setElapsedTime(0);
+    showFeedbackMessage("correct", "Restarted!");
+  };
+
+  const handleNewSet = () => {
+    const newSeed = getRandomSeed();
+    setCurrentSeed(newSeed);
+    dispatch({ type: "NEW_SET", nums: newSeed.nums });
+    setShowSummary(false);
+    setElapsedTime(0);
+    showFeedbackMessage("correct", "New set loaded!");
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary p-4">
-      <div className="container max-w-4xl mx-auto py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <Link to="/" className="text-sm text-muted-foreground hover:text-primary mb-2 inline-block">
-              ← Back to Home
-            </Link>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent">
-              Contains Duplicate
-            </h1>
-            <p className="text-muted-foreground mt-1">Arrays & Hashing</p>
+    <div className="min-h-screen bg-background pb-20">
+      {/* Header */}
+      <header className="sticky top-0 z-40 bg-background/95 backdrop-blur border-b">
+        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div>
+              <h1 className="text-lg font-bold">Contains Duplicate</h1>
+              <p className="text-xs text-muted-foreground">
+                {formatTime(elapsedTime)} • Score: {state.score}
+              </p>
+            </div>
           </div>
-          <div className="flex items-center gap-4">
-            <Badge variant="secondary" className="text-lg px-4 py-2">
-              Score: {score}
-            </Badge>
-            <Button onClick={handleRestart} variant="outline" size="icon">
-              <RotateCcw className="h-4 w-4" />
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={handleRestart}>
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleNewSet}>
+              <Shuffle className="h-4 w-4" />
             </Button>
           </div>
         </div>
+      </header>
 
-        {/* Progress Bar */}
-        <div className="mb-8">
-          <div className="flex justify-between mb-2 text-sm text-muted-foreground">
-            <span>Progress</span>
-            <span>{phase === "complete" ? "100%" : `${((["intro", "warmup", "code", "concept", "reflection", "complete"].indexOf(phase) + 1) / 6 * 100).toFixed(0)}%`}</span>
-          </div>
-          <div className="h-2 bg-secondary rounded-full overflow-hidden">
-            <motion.div
-              className="h-full bg-gradient-to-r from-red-500 to-red-600"
-              initial={{ width: "0%" }}
-              animate={{ width: `${((["intro", "warmup", "code", "concept", "reflection", "complete"].indexOf(phase) + 1) / 6 * 100)}%` }}
-              transition={{ duration: 0.5 }}
-            />
-          </div>
+      {/* Problem Description */}
+      <ProblemDescription
+        description={drillData.problemDescription}
+        storageKey="contains-duplicate-description-visible"
+      />
+
+      {/* Status Badges */}
+      <div className="container mx-auto px-4 mb-4">
+        <div className="flex flex-wrap gap-2 justify-center">
+          <Badge variant="outline" className="text-xs">
+            Phase: {state.phase === "scan" ? "Scanning" : "Complete"}
+          </Badge>
+          <Badge variant="secondary" className="text-xs">
+            Complexity: O(n)
+          </Badge>
+          <Badge variant="outline" className="text-xs">
+            Progress: {state.idx}/{state.nums.length}
+          </Badge>
         </div>
-
-        {/* Content */}
-        <AnimatePresence mode="wait">
-          {phase === "intro" && (
-            <motion.div
-              key="intro"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-            >
-              <Card className="p-8 bg-gradient-to-br from-card to-card/80 border-2 border-red-500/20">
-                <div className="flex items-start gap-4 mb-6">
-                  <Sparkles className="h-12 w-12 text-red-500 flex-shrink-0" />
-                  <div>
-                    <h2 className="text-3xl font-bold mb-4 text-card-foreground">
-                      ✨ Let's test your hashing instincts!
-                    </h2>
-                    <p className="text-lg text-muted-foreground leading-relaxed">
-                      Given a list of numbers, tell me if any number shows up twice.
-                    </p>
-                    <p className="text-lg text-muted-foreground leading-relaxed mt-4">
-                      Try to imagine the hash set forming in real time — like a digital memory net catching duplicates midair 🕸️
-                    </p>
-                  </div>
-                </div>
-                <Button
-                  onClick={handleNext}
-                  size="lg"
-                  className="w-full h-14 text-lg bg-gradient-to-r from-red-500 to-red-600 hover:opacity-90"
-                >
-                  Start Warm-up
-                  <ChevronRight className="ml-2 h-5 w-5" />
-                </Button>
-              </Card>
-            </motion.div>
-          )}
-
-          {phase === "warmup" && (
-            <motion.div
-              key="warmup"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-            >
-              <Card className="p-8 bg-gradient-to-br from-card to-card/80 border-2 border-red-500/20">
-                <div className="mb-6">
-                  <Badge variant="outline" className="mb-4">
-                    Warm-up {currentTest + 1} of {testCases.length}
-                  </Badge>
-                  <h2 className="text-2xl font-bold mb-4 text-card-foreground">
-                    Predict the output
-                  </h2>
-                  <div className="bg-secondary/50 p-6 rounded-lg mb-6">
-                    <p className="text-sm text-muted-foreground mb-2">Input:</p>
-                    <code className="text-2xl font-mono text-card-foreground">
-                      {JSON.stringify(testCases[currentTest].input)}
-                    </code>
-                  </div>
-                </div>
-
-                <div className="flex gap-4 mb-6">
-                  <Button
-                    onClick={() => handleAnswer(true)}
-                    disabled={showFeedback}
-                    size="lg"
-                    className="flex-1 h-16 text-lg bg-red-500 hover:bg-red-600"
-                  >
-                    True
-                  </Button>
-                  <Button
-                    onClick={() => handleAnswer(false)}
-                    disabled={showFeedback}
-                    size="lg"
-                    variant="outline"
-                    className="flex-1 h-16 text-lg border-2 border-red-500 text-red-500 hover:bg-red-500/10"
-                  >
-                    False
-                  </Button>
-                </div>
-
-                {showFeedback && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className={`p-4 rounded-lg mb-6 ${
-                      userAnswer === testCases[currentTest].output
-                        ? "bg-green-500/10 border border-green-500/50"
-                        : "bg-red-500/10 border border-red-500/50"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      {userAnswer === testCases[currentTest].output ? (
-                        <>
-                          <CheckCircle2 className="h-6 w-6 text-green-500" />
-                          <div>
-                            <p className="font-bold text-green-500">Correct! +10 points</p>
-                            <p className="text-sm text-muted-foreground">
-                              Output: {testCases[currentTest].output.toString()}
-                            </p>
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <XCircle className="h-6 w-6 text-red-500" />
-                          <div>
-                            <p className="font-bold text-red-500">Not quite</p>
-                            <p className="text-sm text-muted-foreground">
-                              Correct output: {testCases[currentTest].output.toString()}
-                            </p>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </motion.div>
-                )}
-
-                {showFeedback && (
-                  <Button
-                    onClick={handleNext}
-                    size="lg"
-                    className="w-full h-14 text-lg bg-gradient-to-r from-red-500 to-red-600 hover:opacity-90"
-                  >
-                    {currentTest < testCases.length - 1 ? "Next Test Case" : "Continue to Code"}
-                    <ChevronRight className="ml-2 h-5 w-5" />
-                  </Button>
-                )}
-              </Card>
-            </motion.div>
-          )}
-
-          {phase === "code" && (
-            <motion.div
-              key="code"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-            >
-              <Card className="p-8 bg-gradient-to-br from-card to-card/80 border-2 border-red-500/20">
-                <div className="flex items-start gap-4 mb-6">
-                  <Code2 className="h-10 w-10 text-red-500 flex-shrink-0" />
-                  <div>
-                    <h2 className="text-2xl font-bold mb-4 text-card-foreground">
-                      Code Snippet Flash
-                    </h2>
-                    <p className="text-muted-foreground mb-6">
-                      Here's the optimal solution. Study how the hash set catches duplicates:
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="bg-slate-900 p-6 rounded-lg mb-6 font-mono text-sm overflow-x-auto">
-                  <pre className="text-slate-100">
-{`def containsDuplicate(nums):
-    seen = set()
-    for n in nums:
-        if n in seen:
-            return True
-        seen.add(n)
-    return False`}
-                  </pre>
-                </div>
-
-                <div className="bg-secondary/50 p-4 rounded-lg mb-6">
-                  <p className="text-sm text-muted-foreground">
-                    <strong className="text-card-foreground">Key insight:</strong> We use a set to track numbers we've seen. 
-                    If we encounter a number already in the set, we've found a duplicate!
-                  </p>
-                </div>
-
-                <Button
-                  onClick={handleNext}
-                  size="lg"
-                  className="w-full h-14 text-lg bg-gradient-to-r from-red-500 to-red-600 hover:opacity-90"
-                >
-                  Continue to Concept
-                  <ChevronRight className="ml-2 h-5 w-5" />
-                </Button>
-              </Card>
-            </motion.div>
-          )}
-
-          {phase === "concept" && (
-            <motion.div
-              key="concept"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-            >
-              <Card className="p-8 bg-gradient-to-br from-card to-card/80 border-2 border-red-500/20">
-                <div className="mb-6">
-                  <Badge className="mb-4 bg-red-500">Pattern Recognition</Badge>
-                  <h2 className="text-2xl font-bold mb-4 text-card-foreground">
-                    Concept Tags
-                  </h2>
-                </div>
-
-                <div className="space-y-4 mb-6">
-                  <div className="bg-secondary/50 p-4 rounded-lg">
-                    <p className="font-bold text-card-foreground mb-2">Pattern</p>
-                    <p className="text-muted-foreground">Arrays / Hashing</p>
-                  </div>
-                  <div className="bg-secondary/50 p-4 rounded-lg">
-                    <p className="font-bold text-card-foreground mb-2">Technique</p>
-                    <p className="text-muted-foreground">HashSet membership check (O(1) lookup)</p>
-                  </div>
-                  <div className="bg-secondary/50 p-4 rounded-lg">
-                    <p className="font-bold text-card-foreground mb-2">Time Complexity</p>
-                    <p className="text-muted-foreground">O(n) — single pass through the array</p>
-                  </div>
-                  <div className="bg-secondary/50 p-4 rounded-lg">
-                    <p className="font-bold text-card-foreground mb-2">Space Complexity</p>
-                    <p className="text-muted-foreground">O(n) — worst case, store all elements in set</p>
-                  </div>
-                </div>
-
-                <Button
-                  onClick={handleNext}
-                  size="lg"
-                  className="w-full h-14 text-lg bg-gradient-to-r from-red-500 to-red-600 hover:opacity-90"
-                >
-                  Continue to Reflection
-                  <ChevronRight className="ml-2 h-5 w-5" />
-                </Button>
-              </Card>
-            </motion.div>
-          )}
-
-          {phase === "reflection" && (
-            <motion.div
-              key="reflection"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-            >
-              <Card className="p-8 bg-gradient-to-br from-card to-card/80 border-2 border-red-500/20">
-                <div className="flex items-start gap-4 mb-6">
-                  <Lightbulb className="h-10 w-10 text-red-500 flex-shrink-0" />
-                  <div>
-                    <h2 className="text-2xl font-bold mb-4 text-card-foreground">
-                      Mini Reflection
-                    </h2>
-                    <div className="bg-secondary/50 p-6 rounded-lg mb-6">
-                      <p className="text-lg font-semibold text-card-foreground mb-3">
-                        "Why does a set make this so clean?"
-                      </p>
-                      <p className="text-muted-foreground leading-relaxed">
-                        Because membership lookup in a set is O(1), it's incredibly efficient for duplicate detection. 
-                        Instead of comparing every element with every other element (which would be O(n²)), 
-                        we can check if we've seen an element before in constant time.
-                      </p>
-                    </div>
-                    <div className="bg-primary/10 border border-primary/20 p-4 rounded-lg">
-                      <p className="text-sm text-muted-foreground">
-                        💡 <strong>Pro tip:</strong> Whenever you need to track "have I seen this before?", 
-                        think hash set first. It's your fastest friend for membership checks!
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <Button
-                  onClick={handleNext}
-                  size="lg"
-                  className="w-full h-14 text-lg bg-gradient-to-r from-red-500 to-red-600 hover:opacity-90"
-                >
-                  Complete Drill
-                  <ChevronRight className="ml-2 h-5 w-5" />
-                </Button>
-              </Card>
-            </motion.div>
-          )}
-
-          {phase === "complete" && (
-            <motion.div
-              key="complete"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-            >
-              <Card className="p-8 bg-gradient-to-br from-card to-card/80 border-2 border-red-500/20 text-center">
-                <CheckCircle2 className="h-20 w-20 text-red-500 mx-auto mb-6" />
-                <h2 className="text-3xl font-bold mb-4 text-card-foreground">
-                  Drill Complete! 🎉
-                </h2>
-                <p className="text-xl text-muted-foreground mb-6">
-                  Final Score: {score} points
-                </p>
-                <div className="flex gap-4 justify-center">
-                  <Button
-                    onClick={handleRestart}
-                    size="lg"
-                    variant="outline"
-                    className="border-2 border-red-500 text-red-500 hover:bg-red-500/10"
-                  >
-                    <RotateCcw className="mr-2 h-5 w-5" />
-                    Try Again
-                  </Button>
-                  <Button
-                    asChild
-                    size="lg"
-                    className="bg-gradient-to-r from-red-500 to-red-600 hover:opacity-90"
-                  >
-                    <Link to="/">
-                      Back to Home
-                      <ChevronRight className="ml-2 h-5 w-5" />
-                    </Link>
-                  </Button>
-                </div>
-              </Card>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
+
+      {/* Main Board */}
+      <div className="container mx-auto px-4">
+        <ContainsDuplicateBoard state={state} />
+      </div>
+
+      {/* Controls */}
+      <div className="container mx-auto px-4 mt-6">
+        <Card className="p-4">
+          <div className="grid grid-cols-2 gap-3">
+            <Button
+              onClick={handleCheckNext}
+              disabled={state.phase !== "scan" || state.idx >= state.nums.length}
+              className="w-full col-span-2"
+              size="lg"
+            >
+              <PlayCircle className="h-4 w-4 mr-2" />
+              Check Next Number
+            </Button>
+            <Button variant="outline" onClick={handleRestart} className="w-full">
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Restart
+            </Button>
+            <Button variant="outline" onClick={handleNewSet} className="w-full">
+              <Shuffle className="h-4 w-4 mr-2" />
+              New Set
+            </Button>
+          </div>
+        </Card>
+      </div>
+
+      {/* Summary Modal */}
+      <AnimatePresence>
+        {showSummary && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setShowSummary(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-card border rounded-lg p-6 max-w-md w-full shadow-lg"
+            >
+              <h2 className="text-2xl font-bold mb-4 text-center">
+                {getResult(state) ? "Duplicate Found! 🔴" : "All Unique! ✅"}
+              </h2>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">Time:</span>
+                  <span className="font-semibold">{formatTime(elapsedTime)}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">Score:</span>
+                  <span className="font-semibold">{state.score}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">Elements Checked:</span>
+                  <span className="font-semibold">{state.idx}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">Result:</span>
+                  <Badge variant={getResult(state) ? "destructive" : "default"}>
+                    {getResult(state) ? "true" : "false"}
+                  </Badge>
+                </div>
+                {state.foundDuplicate && state.duplicateValue !== null && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Duplicate Value:</span>
+                    <span className="font-mono font-bold">{state.duplicateValue}</span>
+                  </div>
+                )}
+                <div className="border-t pt-3">
+                  <p className="text-sm text-muted-foreground mb-2">Input Array:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {state.nums.map((v, i) => (
+                      <span 
+                        key={i} 
+                        className={`px-2 py-1 rounded font-mono text-sm ${
+                          v === state.duplicateValue 
+                            ? "bg-destructive/20 text-destructive" 
+                            : "bg-accent text-accent-foreground"
+                        }`}
+                      >
+                        {v}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3 mt-6">
+                <Button variant="outline" onClick={handleRestart} className="w-full">
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Restart
+                </Button>
+                <Button onClick={handleNewSet} className="w-full">
+                  <Shuffle className="h-4 w-4 mr-2" />
+                  New Set
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Feedback Tray */}
+      <FeedbackTray type={feedback?.type || null} message={feedback?.message || ""} />
     </div>
   );
-};
-
-export default ContainsDuplicateRunner;
+}
