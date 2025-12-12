@@ -1,499 +1,227 @@
-import { useState } from "react";
+import { useReducer, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, RotateCcw, Sparkles, CheckCircle2, XCircle, Code2, Lightbulb, Search } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Input } from "@/components/ui/input";
+import { RotateCcw, Shuffle, ArrowRight, Home } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ProblemDescription } from "@/components/drill/ProblemDescription";
+import { TwoSumBoard } from "@/components/drill/TwoSumBoard";
+import drillData from "@/data/two-sum.drills.json";
+import {
+  TSState,
+  TSAction,
+  initTwoSum,
+  reducer,
+  isFinished,
+  getTimeElapsed,
+  calculateBonus,
+} from "@/core/engine/twoSum";
 
-type Phase = "intro" | "warmup" | "code" | "concept" | "reflection" | "complete";
+function getRandomSeed() {
+  const seeds = drillData.seeds;
+  return seeds[Math.floor(Math.random() * seeds.length)];
+}
 
-const testCases = [
-  { nums: [2, 7, 11, 15], target: 9, output: [0, 1] },
-  { nums: [3, 2, 4], target: 6, output: [1, 2] },
-  { nums: [3, 3], target: 6, output: [0, 1] },
-  { nums: [1, 2, 5, 10], target: 7, output: [1, 2] },
-];
+export default function TwoSumRunner() {
+  const [seed, setSeed] = useState(getRandomSeed);
+  const [state, dispatch] = useReducer(reducer, seed, (s) =>
+    initTwoSum(s.nums, s.target)
+  );
+  const [timer, setTimer] = useState(0);
+  const [showSummary, setShowSummary] = useState(false);
+  const [feedback, setFeedback] = useState<string | null>(null);
 
-const TwoSumRunner = () => {
-  const [phase, setPhase] = useState<Phase>("intro");
-  const [currentTest, setCurrentTest] = useState(0);
-  const [userAnswer, setUserAnswer] = useState<string>("");
-  const [showFeedback, setShowFeedback] = useState(false);
-  const [score, setScore] = useState(0);
+  // Timer
+  useEffect(() => {
+    if (isFinished(state)) return;
+    const interval = setInterval(() => {
+      setTimer(getTimeElapsed(state));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [state]);
 
-  const handleAnswer = () => {
-    setShowFeedback(true);
-    try {
-      const parsed = JSON.parse(userAnswer);
-      const expected = testCases[currentTest].output;
-      const correct = 
-        Array.isArray(parsed) && 
-        parsed.length === 2 &&
-        ((parsed[0] === expected[0] && parsed[1] === expected[1]) ||
-         (parsed[0] === expected[1] && parsed[1] === expected[0]));
-      
-      if (correct) {
-        setScore(score + 15);
-      }
-    } catch {
-      // Invalid format
+  // Show summary when done
+  useEffect(() => {
+    if (isFinished(state)) {
+      const timeout = setTimeout(() => setShowSummary(true), 800);
+      return () => clearTimeout(timeout);
     }
-  };
+  }, [state]);
 
-  const handleNext = () => {
-    if (phase === "warmup" && currentTest < testCases.length - 1) {
-      setCurrentTest(currentTest + 1);
-      setUserAnswer("");
-      setShowFeedback(false);
-    } else if (phase === "warmup" && currentTest === testCases.length - 1) {
-      setPhase("code");
-      setShowFeedback(false);
+  const handleCheckNext = () => {
+    if (isFinished(state)) return;
+    
+    const current = state.nums[state.idx];
+    const complement = state.target - current;
+    
+    if (state.seen.has(complement)) {
+      setFeedback(`Found! ${complement} is in HashMap`);
     } else {
-      const phases: Phase[] = ["intro", "warmup", "code", "concept", "reflection", "complete"];
-      const nextPhaseIndex = phases.indexOf(phase) + 1;
-      if (nextPhaseIndex < phases.length) {
-        setPhase(phases[nextPhaseIndex]);
-      }
+      setFeedback(`${complement} not found, adding ${current} to HashMap`);
     }
+    
+    dispatch({ type: "CHECK_NEXT" });
+    setTimeout(() => setFeedback(null), 1500);
   };
 
   const handleRestart = () => {
-    setPhase("intro");
-    setCurrentTest(0);
-    setUserAnswer("");
-    setShowFeedback(false);
-    setScore(0);
+    dispatch({ type: "RESTART" });
+    setShowSummary(false);
+    setFeedback(null);
   };
 
-  const isCorrect = () => {
-    try {
-      const parsed = JSON.parse(userAnswer);
-      const expected = testCases[currentTest].output;
-      return (
-        Array.isArray(parsed) && 
-        parsed.length === 2 &&
-        ((parsed[0] === expected[0] && parsed[1] === expected[1]) ||
-         (parsed[0] === expected[1] && parsed[1] === expected[0]))
-      );
-    } catch {
-      return false;
-    }
+  const handleNewSet = () => {
+    const newSeed = getRandomSeed();
+    setSeed(newSeed);
+    dispatch({ type: "NEW_SET", nums: newSeed.nums, target: newSeed.target });
+    setShowSummary(false);
+    setFeedback(null);
   };
+
+  const bonus = calculateBonus(state);
+  const totalScore = state.score + bonus;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary p-4">
-      <div className="container max-w-4xl mx-auto py-8">
+    <div className="min-h-screen bg-background p-4">
+      <div className="max-w-lg mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-4">
           <div>
-            <Link to="/" className="text-sm text-muted-foreground hover:text-primary mb-2 inline-block">
-              ← Back to Home
+            <Link
+              to="/"
+              className="text-sm text-muted-foreground hover:text-primary"
+            >
+              ← Back
             </Link>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">
-              Two Sum
-            </h1>
-            <p className="text-muted-foreground mt-1">Arrays & Hashing</p>
+            <h1 className="text-2xl font-bold text-foreground">Two Sum</h1>
           </div>
-          <div className="flex items-center gap-4">
-            <Badge variant="secondary" className="text-lg px-4 py-2">
-              Score: {score}
-            </Badge>
-            <Button onClick={handleRestart} variant="outline" size="icon">
-              <RotateCcw className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-
-        {/* Progress Bar */}
-        <div className="mb-8">
-          <div className="flex justify-between mb-2 text-sm text-muted-foreground">
-            <span>Progress</span>
-            <span>{phase === "complete" ? "100%" : `${((["intro", "warmup", "code", "concept", "reflection", "complete"].indexOf(phase) + 1) / 6 * 100).toFixed(0)}%`}</span>
-          </div>
-          <div className="h-2 bg-secondary rounded-full overflow-hidden">
-            <motion.div
-              className="h-full bg-gradient-to-r from-orange-500 to-orange-600"
-              initial={{ width: "0%" }}
-              animate={{ width: `${((["intro", "warmup", "code", "concept", "reflection", "complete"].indexOf(phase) + 1) / 6 * 100)}%` }}
-              transition={{ duration: 0.5 }}
-            />
+          <div className="flex items-center gap-3">
+            <div className="text-right">
+              <div className="text-xs text-muted-foreground">Score</div>
+              <div className="font-bold text-lg text-primary">{state.score}</div>
+            </div>
+            <div className="text-right">
+              <div className="text-xs text-muted-foreground">Time</div>
+              <div className="font-mono text-lg">{timer}s</div>
+            </div>
           </div>
         </div>
 
-        {/* Content */}
-        <AnimatePresence mode="wait">
-          {phase === "intro" && (
+        {/* Problem Description */}
+        <ProblemDescription
+          description={drillData.problemDescription}
+          storageKey="two-sum-desc"
+        />
+
+        {/* Board */}
+        <div className="bg-card rounded-xl p-4 mb-4 border border-border">
+          <TwoSumBoard state={state} />
+        </div>
+
+        {/* Feedback */}
+        <AnimatePresence>
+          {feedback && (
             <motion.div
-              key="intro"
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
+              exit={{ opacity: 0 }}
+              className={`mb-4 p-3 rounded-lg text-center text-sm font-medium ${
+                feedback.includes("Found")
+                  ? "bg-green-500/20 text-green-500"
+                  : "bg-blue-500/20 text-blue-400"
+              }`}
             >
-              <Card className="p-8 bg-gradient-to-br from-card to-card/80 border-2 border-orange-500/20">
-                <div className="flex items-start gap-4 mb-6">
-                  <Search className="h-12 w-12 text-orange-500 flex-shrink-0" />
-                  <div>
-                    <h2 className="text-3xl font-bold mb-4 text-card-foreground">
-                      💫 Let's play detective
-                    </h2>
-                    <p className="text-lg text-muted-foreground leading-relaxed">
-                      You have a list of numbers, and a secret target sum.
-                    </p>
-                    <p className="text-lg text-muted-foreground leading-relaxed mt-4">
-                      Two of these numbers hide the answer — can you catch them in a single pass before they slip by? 🕵️‍♀️
-                    </p>
-                    <p className="text-lg text-muted-foreground leading-relaxed mt-4">
-                      Use your intuition about <strong className="text-card-foreground">complements</strong> — every number has a 'partner' waiting to make the sum complete.
-                    </p>
-                  </div>
-                </div>
-                <Button
-                  onClick={handleNext}
-                  size="lg"
-                  className="w-full h-14 text-lg bg-gradient-to-r from-orange-500 to-orange-600 hover:opacity-90"
-                >
-                  Start Mental Simulation
-                  <ChevronRight className="ml-2 h-5 w-5" />
-                </Button>
-              </Card>
+              {feedback}
             </motion.div>
           )}
+        </AnimatePresence>
 
-          {phase === "warmup" && (
+        {/* Controls */}
+        <div className="flex gap-2">
+          <Button
+            onClick={handleCheckNext}
+            disabled={isFinished(state)}
+            className="flex-1 h-12"
+          >
+            <ArrowRight className="w-4 h-4 mr-2" />
+            Check Next
+          </Button>
+          <Button onClick={handleRestart} variant="outline" size="icon" className="h-12 w-12">
+            <RotateCcw className="w-4 h-4" />
+          </Button>
+          <Button onClick={handleNewSet} variant="outline" size="icon" className="h-12 w-12">
+            <Shuffle className="w-4 h-4" />
+          </Button>
+        </div>
+
+        {/* Summary Modal */}
+        <AnimatePresence>
+          {showSummary && (
             <motion.div
-              key="warmup"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
+              onClick={() => setShowSummary(false)}
             >
-              <Card className="p-8 bg-gradient-to-br from-card to-card/80 border-2 border-orange-500/20">
-                <div className="mb-6">
-                  <Badge variant="outline" className="mb-4">
-                    Test Case {currentTest + 1} of {testCases.length}
-                  </Badge>
-                  <h2 className="text-2xl font-bold mb-4 text-card-foreground">
-                    Predict Output (Mental Simulation)
-                  </h2>
-                  <p className="text-muted-foreground mb-4">
-                    Visualize building the map in your head — scan left to right while whispering each complement to yourself.
-                  </p>
-                  <div className="bg-secondary/50 p-6 rounded-lg mb-6">
-                    <div className="space-y-3">
-                      <div>
-                        <p className="text-sm text-muted-foreground mb-1">nums:</p>
-                        <code className="text-xl font-mono text-card-foreground">
-                          {JSON.stringify(testCases[currentTest].nums)}
-                        </code>
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground mb-1">target:</p>
-                        <code className="text-xl font-mono text-card-foreground">
-                          {testCases[currentTest].target}
-                        </code>
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-card-foreground mb-2 block">
-                      Enter indices as array (e.g., [0, 1]):
-                    </label>
-                    <div className="flex gap-3">
-                      <Input
-                        value={userAnswer}
-                        onChange={(e) => setUserAnswer(e.target.value)}
-                        placeholder="[0, 1]"
-                        className="text-lg font-mono"
-                        disabled={showFeedback}
-                      />
-                      <Button
-                        onClick={handleAnswer}
-                        disabled={showFeedback || !userAnswer}
-                        className="bg-orange-500 hover:bg-orange-600 px-8"
-                      >
-                        Check
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-
-                {showFeedback && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className={`p-4 rounded-lg mb-6 ${
-                      isCorrect()
-                        ? "bg-green-500/10 border border-green-500/50"
-                        : "bg-red-500/10 border border-red-500/50"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      {isCorrect() ? (
-                        <>
-                          <CheckCircle2 className="h-6 w-6 text-green-500" />
-                          <div>
-                            <p className="font-bold text-green-500">Correct! +15 points</p>
-                            <p className="text-sm text-muted-foreground">
-                              Expected: {JSON.stringify(testCases[currentTest].output)}
-                            </p>
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <XCircle className="h-6 w-6 text-red-500" />
-                          <div>
-                            <p className="font-bold text-red-500">Not quite</p>
-                            <p className="text-sm text-muted-foreground">
-                              Correct answer: {JSON.stringify(testCases[currentTest].output)}
-                            </p>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </motion.div>
-                )}
-
-                {showFeedback && (
-                  <Button
-                    onClick={handleNext}
-                    size="lg"
-                    className="w-full h-14 text-lg bg-gradient-to-r from-orange-500 to-orange-600 hover:opacity-90"
-                  >
-                    {currentTest < testCases.length - 1 ? "Next Test Case" : "Continue to Code"}
-                    <ChevronRight className="ml-2 h-5 w-5" />
-                  </Button>
-                )}
-              </Card>
-            </motion.div>
-          )}
-
-          {phase === "code" && (
-            <motion.div
-              key="code"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-            >
-              <Card className="p-8 bg-gradient-to-br from-card to-card/80 border-2 border-orange-500/20">
-                <div className="flex items-start gap-4 mb-6">
-                  <Code2 className="h-10 w-10 text-orange-500 flex-shrink-0" />
-                  <div>
-                    <h2 className="text-2xl font-bold mb-4 text-card-foreground">
-                      Code Visualization
-                    </h2>
-                    <p className="text-muted-foreground mb-6">
-                      Watch how the hash map builds as we scan through the array:
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="bg-slate-900 p-6 rounded-lg mb-6 font-mono text-sm overflow-x-auto">
-                  <pre className="text-slate-100">
-{`def twoSum(nums, target):
-    seen = {}
-    for i, n in enumerate(nums):
-        complement = target - n
-        if complement in seen:
-            return [seen[complement], i]
-        seen[n] = i`}
-                  </pre>
-                </div>
-
-                <div className="space-y-3 mb-6">
-                  <div className="bg-secondary/50 p-4 rounded-lg">
-                    <p className="text-sm font-medium text-card-foreground mb-2">💭 As it runs, imagine:</p>
-                    <ul className="space-y-2 text-muted-foreground text-sm">
-                      <li>• The <code className="text-orange-500">seen</code> dictionary growing with each iteration</li>
-                      <li>• Each lookup checking "is your partner already in the map?" 💞</li>
-                      <li>• The moment when complement matches — that's when we found our pair!</li>
-                    </ul>
-                  </div>
-                </div>
-
-                <Button
-                  onClick={handleNext}
-                  size="lg"
-                  className="w-full h-14 text-lg bg-gradient-to-r from-orange-500 to-orange-600 hover:opacity-90"
-                >
-                  Continue to Concept
-                  <ChevronRight className="ml-2 h-5 w-5" />
-                </Button>
-              </Card>
-            </motion.div>
-          )}
-
-          {phase === "concept" && (
-            <motion.div
-              key="concept"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-            >
-              <Card className="p-8 bg-gradient-to-br from-card to-card/80 border-2 border-orange-500/20">
-                <div className="mb-6">
-                  <Badge className="mb-4 bg-orange-500">Pattern: Hash Map Lookup</Badge>
-                  <h2 className="text-2xl font-bold mb-4 text-card-foreground">
-                    Concept Reflection
-                  </h2>
-                  <div className="bg-secondary/50 p-6 rounded-lg mb-6">
-                    <p className="text-lg font-semibold text-card-foreground mb-3">
-                      "Why do we need a hash map here?"
-                    </p>
-                    <p className="text-muted-foreground leading-relaxed">
-                      Because it gives us <strong className="text-orange-500">O(1) lookups</strong> — every number can instantly check if its missing piece has already appeared. 
-                      Without it, we'd need nested loops checking every pair (O(n²)). The hash map is our "memory" that remembers what we've seen.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="space-y-3 mb-6">
-                  <h3 className="font-bold text-card-foreground">Then reflect:</h3>
-                  <div className="bg-secondary/50 p-4 rounded-lg">
-                    <p className="font-medium text-card-foreground mb-2">What would happen if we didn't use a hash map?</p>
-                    <p className="text-sm text-muted-foreground">
-                      We'd need two nested loops to compare every pair → O(n²) time complexity. Much slower for large arrays!
-                    </p>
-                  </div>
-                  <div className="bg-secondary/50 p-4 rounded-lg">
-                    <p className="font-medium text-card-foreground mb-2">Could this pattern extend to 3Sum or 4Sum?</p>
-                    <p className="text-sm text-muted-foreground">
-                      Yes! 3Sum uses this Two Sum as a subroutine. Fix one element, then find Two Sum in the rest. Hash maps are the foundation.
-                    </p>
-                  </div>
-                </div>
-
-                <Button
-                  onClick={handleNext}
-                  size="lg"
-                  className="w-full h-14 text-lg bg-gradient-to-r from-orange-500 to-orange-600 hover:opacity-90"
-                >
-                  Continue to Key Insights
-                  <ChevronRight className="ml-2 h-5 w-5" />
-                </Button>
-              </Card>
-            </motion.div>
-          )}
-
-          {phase === "reflection" && (
-            <motion.div
-              key="reflection"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-            >
-              <Card className="p-8 bg-gradient-to-br from-card to-card/80 border-2 border-orange-500/20">
-                <div className="flex items-start gap-4 mb-6">
-                  <Lightbulb className="h-10 w-10 text-orange-500 flex-shrink-0" />
-                  <div className="w-full">
-                    <h2 className="text-2xl font-bold mb-4 text-card-foreground">
-                      🪞 Key Insights Recap
-                    </h2>
-                    
-                    <div className="bg-secondary/50 rounded-lg overflow-hidden">
-                      <table className="w-full">
-                        <thead className="bg-orange-500/20">
-                          <tr>
-                            <th className="text-left p-3 font-semibold text-card-foreground">Check</th>
-                            <th className="text-left p-3 font-semibold text-card-foreground">Why it Matters</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-border">
-                          <tr>
-                            <td className="p-3 font-mono text-sm text-orange-500">complement = target - n</td>
-                            <td className="p-3 text-sm text-muted-foreground">Finds the partner number dynamically</td>
-                          </tr>
-                          <tr>
-                            <td className="p-3 font-mono text-sm text-orange-500">if complement in seen:</td>
-                            <td className="p-3 text-sm text-muted-foreground">Instant lookup (O(1))</td>
-                          </tr>
-                          <tr>
-                            <td className="p-3 font-mono text-sm text-orange-500">seen[n] = i</td>
-                            <td className="p-3 text-sm text-muted-foreground">Records position for future matches</td>
-                          </tr>
-                          <tr>
-                            <td className="p-3 font-mono text-sm text-orange-500">return [seen[complement], i]</td>
-                            <td className="p-3 text-sm text-muted-foreground">Returns indices in input order</td>
-                          </tr>
-                          <tr>
-                            <td className="p-3 font-mono text-sm text-orange-500">Time: O(n)</td>
-                            <td className="p-3 text-sm text-muted-foreground">One pass through list</td>
-                          </tr>
-                          <tr>
-                            <td className="p-3 font-mono text-sm text-orange-500">Space: O(n)</td>
-                            <td className="p-3 text-sm text-muted-foreground">Stores at most one entry per number</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-
-                    <div className="bg-primary/10 border border-primary/20 p-4 rounded-lg mt-6">
-                      <p className="text-sm text-muted-foreground">
-                        ✨ <strong>Review tip:</strong> Each time you replay, shuffle inputs (some solvable, some not). 
-                        When you get 3 correct in a row → mark this pattern as "Mastered (Tier 1)" 🌿
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <Button
-                  onClick={handleNext}
-                  size="lg"
-                  className="w-full h-14 text-lg bg-gradient-to-r from-orange-500 to-orange-600 hover:opacity-90"
-                >
-                  Complete Drill
-                  <ChevronRight className="ml-2 h-5 w-5" />
-                </Button>
-              </Card>
-            </motion.div>
-          )}
-
-          {phase === "complete" && (
-            <motion.div
-              key="complete"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-            >
-              <Card className="p-8 bg-gradient-to-br from-card to-card/80 border-2 border-orange-500/20 text-center">
-                <CheckCircle2 className="h-20 w-20 text-orange-500 mx-auto mb-6" />
-                <h2 className="text-3xl font-bold mb-4 text-card-foreground">
-                  Drill Complete! 🎉
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                className="bg-card rounded-xl p-6 max-w-sm w-full border border-border"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <h2 className="text-2xl font-bold text-center mb-4">
+                  {state.foundPair ? "🎉 Pair Found!" : "Drill Complete"}
                 </h2>
-                <p className="text-xl text-muted-foreground mb-2">
-                  Final Score: {score} points
-                </p>
-                <p className="text-sm text-muted-foreground mb-6">
-                  You've mastered the complement pattern! 🕵️‍♀️
-                </p>
-                <div className="flex gap-4 justify-center">
-                  <Button
-                    onClick={handleRestart}
-                    size="lg"
-                    variant="outline"
-                    className="border-2 border-orange-500 text-orange-500 hover:bg-orange-500/10"
-                  >
-                    <RotateCcw className="mr-2 h-5 w-5" />
-                    Try Again
+                <div className="space-y-3 mb-6">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Array Length</span>
+                    <span className="font-bold">{state.nums.length}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Base Score</span>
+                    <span className="font-bold">{state.score}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Bonus</span>
+                    <span className="font-bold text-green-500">+{bonus}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Time</span>
+                    <span className="font-mono">{timer}s</span>
+                  </div>
+                  <div className="border-t border-border pt-3 flex justify-between">
+                    <span className="font-bold">Total Score</span>
+                    <span className="font-bold text-primary text-xl">{totalScore}</span>
+                  </div>
+                  {state.foundPair && (
+                    <div className="bg-green-500/20 rounded-lg p-3 text-center">
+                      <div className="text-sm text-muted-foreground">Result</div>
+                      <div className="font-mono font-bold">[{state.foundPair[0]}, {state.foundPair[1]}]</div>
+                    </div>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <Button onClick={handleRestart} variant="outline" className="flex-1">
+                    <RotateCcw className="w-4 h-4 mr-2" />
+                    Restart
                   </Button>
-                  <Button
-                    asChild
-                    size="lg"
-                    className="bg-gradient-to-r from-orange-500 to-orange-600 hover:opacity-90"
-                  >
-                    <Link to="/">
-                      Back to Home
-                      <ChevronRight className="ml-2 h-5 w-5" />
-                    </Link>
+                  <Button onClick={handleNewSet} className="flex-1">
+                    <Shuffle className="w-4 h-4 mr-2" />
+                    New Set
                   </Button>
                 </div>
-              </Card>
+                <Link to="/" className="block mt-3">
+                  <Button variant="ghost" className="w-full">
+                    <Home className="w-4 h-4 mr-2" />
+                    Home
+                  </Button>
+                </Link>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
     </div>
   );
-};
-
-export default TwoSumRunner;
+}
