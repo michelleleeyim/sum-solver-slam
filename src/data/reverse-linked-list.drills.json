@@ -1,0 +1,14 @@
+{
+  "problemId": "reverse-linked-list",
+  "title": "Reverse Linked List",
+  "problemDescription": "Given the head of a singly linked list, reverse the list and return the reversed list.",
+  "seeds": [
+    { "nodes": [1, 2, 3, 4, 5] },
+    { "nodes": [2, 4, 6, 8] },
+    { "nodes": [10, 20, 30, 40, 50, 60] },
+    { "nodes": [5, 3, 1] },
+    { "nodes": [7, 14, 21, 28, 35] },
+    { "nodes": [1, 2] },
+    { "nodes": [99, 88, 77, 66, 55, 44, 33] }
+  ]
+}
