@@ -1,0 +1,10 @@
+{
+  "problemDescription": "Design a linked list that supports: get(index), addAtHead(val), addAtTail(val), addAtIndex(index, val), deleteAtIndex(index). Tap nodes to perform operations.",
+  "seeds": [
+    [1, 2, 3],
+    [10, 20, 30, 40],
+    [5, 15, 25],
+    [100, 200],
+    [7, 14, 21, 28, 35]
+  ]
+}

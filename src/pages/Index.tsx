@@ -31,6 +31,7 @@ const Index = () => {
 
   const linkedListProblems = [
     { name: "Reverse Linked List", path: "/drill/reverse-linked-list", color: "emerald" },
+    { name: "Design Linked List", path: "/drill/design-linked-list", color: "violet" },
     { name: "Merge Two Sorted Lists", path: "#", color: "sky", disabled: true },
     { name: "Linked List Cycle", path: "#", color: "rose", disabled: true },
     { name: "Reorder List", path: "#", color: "amber", disabled: true },
