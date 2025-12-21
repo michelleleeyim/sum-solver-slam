@@ -22,6 +22,7 @@ import EncodeDecodeRunner from "./pages/EncodeDecodeRunner";
 import ProductArrayRunner from "./pages/ProductArrayRunner";
 import ReverseLinkedListRunner from "./pages/ReverseLinkedListRunner";
 import DesignLinkedListRunner from "./pages/DesignLinkedListRunner";
+import InvertBinaryTreeRunner from "./pages/InvertBinaryTreeRunner";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -52,6 +53,7 @@ const App = () => (
           <Route path="/drill/product-array" element={<ProductArrayRunner />} />
           <Route path="/drill/reverse-linked-list" element={<ReverseLinkedListRunner />} />
           <Route path="/drill/design-linked-list" element={<DesignLinkedListRunner />} />
+          <Route path="/drill/invert-binary-tree" element={<InvertBinaryTreeRunner />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

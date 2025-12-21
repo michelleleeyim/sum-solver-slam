@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowRight, Target, Hash, Link2, ChevronDown, ChevronRight } from "lucide-react";
+import { ArrowRight, Target, Hash, Link2, ChevronDown, ChevronRight, TreeDeciduous } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -10,7 +10,7 @@ const Index = () => {
   const [arraysOpen, setArraysOpen] = useState(false);
   const [pointersOpen, setPointersOpen] = useState(false);
   const [linkedListOpen, setLinkedListOpen] = useState(false);
-
+  const [treesOpen, setTreesOpen] = useState(false);
   const arrayProblems = [
     { name: "Contains Duplicate", path: "/drill/contains-duplicate", color: "red" },
     { name: "Valid Anagram", path: "/drill/valid-anagram", color: "blue" },
@@ -35,6 +35,14 @@ const Index = () => {
     { name: "Merge Two Sorted Lists", path: "#", color: "sky", disabled: true },
     { name: "Linked List Cycle", path: "#", color: "rose", disabled: true },
     { name: "Reorder List", path: "#", color: "amber", disabled: true },
+  ];
+
+  const treeProblems = [
+    { name: "Invert Binary Tree", path: "/drill/invert-binary-tree", color: "green" },
+    { name: "Maximum Depth of Binary Tree", path: "#", color: "teal", disabled: true },
+    { name: "Same Tree", path: "#", color: "cyan", disabled: true },
+    { name: "Subtree of Another Tree", path: "#", color: "blue", disabled: true },
+    { name: "Binary Tree Level Order Traversal", path: "#", color: "indigo", disabled: true },
   ];
 
   return (
@@ -225,6 +233,66 @@ const Index = () => {
                               <div className="flex items-center justify-between">
                                 <span className="font-medium text-card-foreground">{problem.name}</span>
                                 <ArrowRight className="h-4 w-4 text-emerald-500" />
+                              </div>
+                            </Card>
+                          </Link>
+                        )}
+                      </motion.div>
+                    ))}
+                  </div>
+                </CollapsibleContent>
+              </Card>
+            </Collapsible>
+          </motion.div>
+
+          {/* Trees Folder */}
+          <motion.div
+            initial={{ y: 40, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+          >
+            <Collapsible open={treesOpen} onOpenChange={setTreesOpen}>
+              <Card className="p-6 shadow-xl bg-gradient-to-br from-card to-card/80 border-2 border-green-500/20">
+                <CollapsibleTrigger className="w-full">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 rounded-2xl bg-green-500/10">
+                        <TreeDeciduous className="h-8 w-8 text-green-500" />
+                      </div>
+                      <div className="text-left">
+                        <h2 className="text-2xl font-bold text-card-foreground flex items-center gap-2">
+                          Trees
+                          {treesOpen ? <ChevronDown className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
+                        </h2>
+                        <p className="text-sm text-muted-foreground">
+                          {treeProblems.length} problems · DFS, BFS, recursion, tree traversals
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <div className="mt-6 grid gap-3">
+                    {treeProblems.map((problem, idx) => (
+                      <motion.div
+                        key={problem.name}
+                        initial={{ x: -20, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: 0.1 * idx }}
+                      >
+                        {problem.disabled ? (
+                          <Card className="p-4 bg-secondary/30 border border-muted opacity-60">
+                            <div className="flex items-center justify-between">
+                              <span className="font-medium text-muted-foreground">{problem.name}</span>
+                              <span className="text-xs text-muted-foreground">Coming Soon</span>
+                            </div>
+                          </Card>
+                        ) : (
+                          <Link to={problem.path}>
+                            <Card className="p-4 bg-secondary/50 hover:bg-secondary/80 transition-all hover:scale-[1.02] border border-muted hover:border-green-500/50">
+                              <div className="flex items-center justify-between">
+                                <span className="font-medium text-card-foreground">{problem.name}</span>
+                                <ArrowRight className="h-4 w-4 text-green-500" />
                               </div>
                             </Card>
                           </Link>
