@@ -25,6 +25,7 @@ import DesignLinkedListRunner from "./pages/DesignLinkedListRunner";
 import InvertBinaryTreeRunner from "./pages/InvertBinaryTreeRunner";
 import MaxDepthBinaryTreeRunner from "./pages/MaxDepthBinaryTreeRunner";
 import SameTreeRunner from "./pages/SameTreeRunner";
+import SubtreeOfAnotherTreeRunner from "./pages/SubtreeOfAnotherTreeRunner";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -58,6 +59,7 @@ const App = () => (
           <Route path="/drill/invert-binary-tree" element={<InvertBinaryTreeRunner />} />
           <Route path="/drill/max-depth-binary-tree" element={<MaxDepthBinaryTreeRunner />} />
           <Route path="/drill/same-tree" element={<SameTreeRunner />} />
+          <Route path="/drill/subtree-of-another-tree" element={<SubtreeOfAnotherTreeRunner />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

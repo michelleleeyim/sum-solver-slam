@@ -41,7 +41,7 @@ const Index = () => {
     { name: "Invert Binary Tree", path: "/drill/invert-binary-tree", color: "green" },
     { name: "Maximum Depth of Binary Tree", path: "/drill/max-depth-binary-tree", color: "teal" },
     { name: "Same Tree", path: "/drill/same-tree", color: "cyan" },
-    { name: "Subtree of Another Tree", path: "#", color: "blue", disabled: true },
+    { name: "Subtree of Another Tree", path: "/drill/subtree-of-another-tree", color: "blue" },
     { name: "Binary Tree Level Order Traversal", path: "#", color: "indigo", disabled: true },
   ];
 
