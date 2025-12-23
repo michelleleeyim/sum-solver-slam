@@ -1,0 +1,53 @@
+{
+  "problemDescription": "Given the roots of two binary trees `root` and `subRoot`, return true if there is a subtree of `root` with the same structure and node values as `subRoot`.\n\nA subtree of a binary tree is a tree that consists of a node in `root` and all of that node's descendants.\n\nExample:\n```\nRoot:        SubRoot:\n    3            4\n   / \\          / \\\n  4   5        1   2\n / \\\n1   2\n\nOutput: true\n```",
+  "treePairs": [
+    {
+      "root": [3, 4, 5, 1, 2],
+      "subRoot": [4, 1, 2],
+      "expected": true,
+      "description": "Standard subtree match"
+    },
+    {
+      "root": [3, 4, 5, 1, 2, null, null, null, null, 0],
+      "subRoot": [4, 1, 2],
+      "expected": false,
+      "description": "Same values but different structure"
+    },
+    {
+      "root": [1, 2, 3, 4, 5, 6, 7],
+      "subRoot": [2, 4, 5],
+      "expected": true,
+      "description": "Left subtree match"
+    },
+    {
+      "root": [1, 2, 3, 4, 5, 6, 7],
+      "subRoot": [3, 6, 7],
+      "expected": true,
+      "description": "Right subtree match"
+    },
+    {
+      "root": [1, 1],
+      "subRoot": [1],
+      "expected": true,
+      "description": "Single node subtree"
+    },
+    {
+      "root": [3, 4, 5, 1, null, 2],
+      "subRoot": [3, 1, 2],
+      "expected": false,
+      "description": "No match - different structure"
+    },
+    {
+      "root": [1, 2, 3],
+      "subRoot": [1, 2, 3],
+      "expected": true,
+      "description": "Entire tree is subtree"
+    },
+    {
+      "root": [12],
+      "subRoot": [2],
+      "expected": false,
+      "description": "Different values"
+    }
+  ]
+}
